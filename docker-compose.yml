@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: carfinder_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: carfinder
+      MYSQL_USER: carfinder_user
+      MYSQL_PASSWORD: carfinder_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - carfinder_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: carfinder_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - carfinder_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: carfinder_backend
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: carfinder
+      DB_USER: carfinder_user
+      DB_PASSWORD: carfinder_pass
+    depends_on:
+      - mysql
+    networks:
+      - carfinder_network
+
+volumes:
+  mysql_data:
+
+networks:
+  carfinder_network:
+    driver: bridge
