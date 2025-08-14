@@ -1,0 +1,89 @@
+# CarFinder Backend - Java/Maven .dockerignore
+
+# ====================
+# Build Output
+# ====================
+target/
+!target/*.jar
+!target/lib/
+
+# ====================
+# Maven
+# ====================
+.mvn/wrapper/maven-wrapper.jar
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.properties
+
+# ====================
+# IDE Files
+# ====================
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+.springBeans
+.sts4-cache
+
+# ====================
+# Logs
+# ====================
+*.log
+logs/
+
+# ====================
+# OS Files
+# ====================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ====================
+# Git
+# ====================
+.git/
+.gitignore
+.gitattributes
+
+# ====================
+# Documentation
+# ====================
+README.md
+HELP.md
+*.md
+
+# ====================
+# Test Files
+# ====================
+src/test/
+
+# ====================
+# Temporary Files
+# ====================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# ====================
+# Docker
+# ====================
+Dockerfile
+.dockerignore
+docker-compose.yml
