@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="400" height="225" viewBox="0 0 400 225" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="225" fill="#242424"/>
+  <path d="M315 145C315 156.046 306.046 165 295 165H105C93.9543 165 85 156.046 85 145V80C85 68.9543 93.9543 60 105 60H295C306.046 60 315 68.9543 315 80V145Z" fill="#555555"/>
+  <circle cx="125" cy="155" r="20" fill="#333333" stroke="#555555" stroke-width="4"/>
+  <circle cx="275" cy="155" r="20" fill="#333333" stroke="#555555" stroke-width="4"/>
+  <path d="M115 120L285 120L310 90L90 90L115 120Z" fill="#666666"/>
+  <rect x="105" y="120" width="190" height="5" fill="#888888"/>
+  <rect x="135" y="90" width="130" height="30" rx="5" fill="#222222"/>
+  <text x="200" y="110" font-family="Arial" font-size="12" text-anchor="middle" fill="#CCCCCC">CAR 6</text>
+</svg>
