@@ -80,18 +80,28 @@
   position: relative;
 }
 
+/* Right side container (search + user profile) */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+}
+
 .search-input {
   background-color: rgba(255, 255, 255, 0.1);
   border: none;
   border-radius: 20px;
-  padding: 8px 40px 8px 15px;
+  padding: 8px 16px;
   color: white;
   font-size: 14px;
   width: 240px;
   transition: all 0.3s ease;
 }
 
-.search-bar { position:relative; margin-right:1.2rem; }
+.search-bar { position:relative; margin-right:.4rem; }
+/* El form debe ser flex para que íconos y input estén en una sola fila */
+.search-bar form { position:relative; }
 .search-icon { display:flex; align-items:center; justify-content:center; cursor:pointer; padding:.45rem; margin-left:1.2rem; border-radius:50%; transition:background .3s; position:relative; top:2px; }
 .search-icon:hover { background:rgba(255,255,255,.12); }
 .search-icon svg { display:block; }
@@ -106,26 +116,17 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
-.search-submit,
-.search-close {
-  position: absolute;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: rgba(255, 255, 255, 0.7);
-  transition: color 0.2s ease;
-  padding: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+/* Inline search layout */
+.search-inline { display:flex; align-items:center; gap:.45rem; }
+.search-inline .search-input.inline { flex:1; padding:8px 14px; min-width:230px; }
+.icon-btn { background:transparent; border:none; display:flex; align-items:center; justify-content:center; padding:4px; border-radius:6px; cursor:pointer; color:#fff; transition:background .25s, color .25s; line-height:0; }
+.icon-btn:hover { background:rgba(255,255,255,.15); }
+.icon-btn:focus { outline:2px solid rgba(255,255,255,.35); outline-offset:2px; }
+.icon-btn svg { pointer-events:none; }
 
-.search-submit {
-  right: 30px;
-}
-
-.search-close {
-  right: 5px;
+@media (max-width: 620px) {
+  .search-inline .search-input.inline { padding:6px 10px; }
+  .icon-btn { padding:5px; }
 }
 
 .search-submit:hover,

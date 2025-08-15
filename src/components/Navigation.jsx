@@ -30,11 +30,6 @@ const Navigation = ({ onSearch = () => {} }) => {
     }
   }, [showSearch]);
   
-  // Función para manejar el clic en el icono de búsqueda
-  const handleSearchClick = () => {
-    setShowSearch(true);
-  };
-  
   // Función para manejar la búsqueda
   const handleSearch = (e) => {
     e.preventDefault();
@@ -71,59 +66,50 @@ const Navigation = ({ onSearch = () => {} }) => {
           <button className="nav-link active" type="button">Browse</button>
           <button className="nav-link" type="button">Saved Cars</button>
           <button className="nav-link" type="button">Compare</button>
-          <button 
-            className={`nav-link ${showSearch ? 'active' : ''}`}
-            type="button" 
-            onClick={() => {
-              setShowSearch(prev => !prev);
-              if (!showSearch) {
-                setTimeout(() => searchInputRef.current?.focus(), 20);
-              }
-            }}
-          >Search</button>
         </div>
         
         <div className="nav-right">
           {showSearch ? (
             <div className="search-bar">
-              <form onSubmit={handleSearch}>
+              <form onSubmit={handleSearch} className="search-inline">
+                <button type="submit" className="icon-btn" aria-label="Buscar">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </button>
+                <button type="button" className="icon-btn" onClick={handleCloseSearch} aria-label="Cerrar búsqueda">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
                 <input
                   type="text"
                   ref={searchInputRef}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Buscar vehículos..."
-                  className="search-input"
+                  className="search-input inline"
                 />
-                <button type="submit" className="search-submit">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                  </svg>
-                </button>
-                <button type="button" className="search-close" onClick={handleCloseSearch}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                </button>
               </form>
             </div>
           ) : (
-            <div className="search-icon" onClick={handleSearchClick} role="button" tabIndex={0} onKeyDown={(e)=> (e.key==='Enter') && handleSearchClick()} aria-label="Open search">
+            <button className="search-icon" onClick={() => {
+              setShowSearch(true);
+              setTimeout(() => searchInputRef.current?.focus(), 20);
+            }} aria-label="Open search">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
-            </div>
+            </button>
           )}
           
           <div className="user-profile">
             <div className="user-avatar">JS</div>
             <span className="user-name">Julia Smith</span>
           </div>
-          
-          {/* Hamburguesa eliminada */}
         </div>
       </div>
       
