@@ -5,6 +5,7 @@ import VehicleDetails from './VehicleDetails';
 import VehicleForm from './VehicleForm';
 import Navigation from './Navigation';
 import FilterPanel from './FilterPanel';
+import ConfirmationModal from './ConfirmationModal';
 
 const VehicleList = () => {
   const [vehicles, setVehicles] = useState([]);
@@ -18,6 +19,8 @@ const VehicleList = () => {
   const [sortOption, setSortOption] = useState('price-low');
   const [activeFilters, setActiveFilters] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [vehicleToDelete, setVehicleToDelete] = useState(null);
 
   const handleImageError = (vehicleId) => {
     setImageErrors(prev => ({
@@ -61,6 +64,10 @@ const VehicleList = () => {
               year: 2019,
               submodel: 'CLASSIC',
               price: 150000,
+              vin: '1FA6P8TH5K5123456',
+              transmission: 'Manual',
+              mileage: 25000,
+              color: 'Red',
               image: 'https://images.unsplash.com/photo-1581650107963-3e8c1f48241b?q=80&w=1000&auto=format&fit=crop'
             },
             {
@@ -70,6 +77,10 @@ const VehicleList = () => {
               year: 2020,
               submodel: 'SS',
               price: 130000,
+              vin: '1G1FB1RX7L0234567',
+              transmission: 'Automatic',
+              mileage: 18000,
+              color: 'Black',
               image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=1000&auto=format&fit=crop'
             },
             {
@@ -79,6 +90,10 @@ const VehicleList = () => {
               year: 2021,
               submodel: 'SRT',
               price: 175000,
+              vin: '2C3CDZC91MH345678',
+              transmission: 'Automatic',
+              mileage: 12000,
+              color: 'Orange',
               image: 'https://images.unsplash.com/photo-1588127333419-b9d7de223dcf?q=80&w=1000&auto=format&fit=crop'
             },
             {
@@ -88,6 +103,10 @@ const VehicleList = () => {
               year: 2022,
               submodel: 'CARRERA',
               price: 220000,
+              vin: 'WP0CA2A94NS456789',
+              transmission: 'Manual',
+              mileage: 8500,
+              color: 'White',
               image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1000&auto=format&fit=crop'
             },
             {
@@ -97,6 +116,10 @@ const VehicleList = () => {
               year: 2023,
               submodel: 'LE',
               price: 45000,
+              vin: 'JTDEBU5E3P3567890',
+              transmission: 'CVT',
+              mileage: 5000,
+              color: 'Silver',
               image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=1000&auto=format&fit=crop'
             },
             {
@@ -106,6 +129,10 @@ const VehicleList = () => {
               year: 2022,
               submodel: 'COMPETITION',
               price: 180000,
+              vin: 'WBS8M9C59N5678901',
+              transmission: 'Automatic',
+              mileage: 15000,
+              color: 'Blue',
               image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=1000&auto=format&fit=crop'
             },
             {
@@ -115,6 +142,10 @@ const VehicleList = () => {
               year: 2021,
               submodel: 'AMG',
               price: 195000,
+              vin: 'W1KZF8DB9MA789012',
+              transmission: 'Automatic',
+              mileage: 22000,
+              color: 'Gray',
               image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=1000&auto=format&fit=crop'
             },
             {
@@ -124,6 +155,10 @@ const VehicleList = () => {
               year: 2020,
               submodel: 'PREMIUM',
               price: 85000,
+              vin: 'WAUDNAF46LA890123',
+              transmission: 'Automatic',
+              mileage: 32000,
+              color: 'Black',
               image: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?q=80&w=1000&auto=format&fit=crop'
             }
           ];
@@ -232,10 +267,23 @@ const VehicleList = () => {
 
   const handleDelete = (vehicleId) => {
     console.log('Delete vehicle:', vehicleId);
-    // Aquí iría el modal de confirmación para eliminar
-    if (window.confirm('Are you sure you want to delete this vehicle?')) {
-      setVehicles(vehicles.filter(vehicle => vehicle.id !== vehicleId));
+    const vehicle = filteredVehicles.find(v => v.id === vehicleId);
+    if (vehicle) {
+      setVehicleToDelete(vehicle);
+      setShowDeleteConfirmation(true);
     }
+  };
+
+  const confirmDelete = () => {
+    if (vehicleToDelete) {
+      setVehicles(vehicles.filter(vehicle => vehicle.id !== vehicleToDelete.id));
+      setVehicleToDelete(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirmation(false);
+    setVehicleToDelete(null);
   };
   
   // Manejar el cambio en la ordenación
@@ -406,6 +454,17 @@ const VehicleList = () => {
           onSave={handleSaveVehicle}
         />
       )}
+
+      <ConfirmationModal
+        show={showDeleteConfirmation}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+        title="Delete Vehicle"
+        message={`Are you sure you want to delete this vehicle? This action cannot be undone.${vehicleToDelete ? `\n\n${vehicleToDelete.make} ${vehicleToDelete.model} ${vehicleToDelete.year}` : ''}`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+      />
       
       <main className="vehicle-list-content">
         {content}

@@ -158,12 +158,15 @@ const ComponentShowcase = () => {
 
   // Open vehicle details modal
   const handleViewVehicleDetails = (vehicle) => {
+    console.log('handleViewVehicleDetails called with:', vehicle);
     setSelectedVehicle(vehicle);
     setIsModalOpen(true);
+    console.log('Modal should now be open, selectedVehicle:', vehicle, 'isModalOpen:', true);
   };
 
   // Close vehicle details modal
   const handleCloseModal = () => {
+    console.log('handleCloseModal called');
     setIsModalOpen(false);
   };
 
@@ -210,6 +213,25 @@ const ComponentShowcase = () => {
         <div className="showcase-header">
           <h1>CarFinder - Find Your Perfect Vehicle</h1>
           <p>Explore our comprehensive vehicle inventory with advanced filtering capabilities to find exactly what you're looking for.</p>
+          
+          {/* DEBUG BUTTON - Remove this after testing */}
+          <button 
+            onClick={() => {
+              console.log('Test button clicked, opening modal with first vehicle');
+              handleViewVehicleDetails(MOCK_VEHICLES[0]);
+            }}
+            style={{
+              background: 'red',
+              color: 'white',
+              padding: '10px 20px',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              margin: '10px 0'
+            }}
+          >
+            TEST MODAL - CLICK ME
+          </button>
         </div>
       
       <div className="showcase-actions">
@@ -226,6 +248,9 @@ const ComponentShowcase = () => {
           <SearchResults filters={selectedFilters} vehicles={MOCK_VEHICLES} />
         </div>
       </div>
+      
+      {/* DEBUG INFO */}
+      {console.log('Render - selectedVehicle:', selectedVehicle, 'isModalOpen:', isModalOpen)}
       
       {selectedVehicle && (
         <VehicleDetailsModal 

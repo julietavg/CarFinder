@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './VehicleDetailsModal.css';
+import '../styles/components/VehicleDetailsModal.css';
 
 const VehicleDetailsModal = ({ vehicle, isOpen, onClose }) => {
   const [mainImage, setMainImage] = useState('');
@@ -36,6 +36,16 @@ const VehicleDetailsModal = ({ vehicle, isOpen, onClose }) => {
   }, [isOpen, onClose]);
 
   if (!vehicle) return null;
+
+  // Debug logging
+  console.log('VehicleDetailsModal rendering:', { 
+    vehicle, 
+    isOpen,
+    vehicleYear: vehicle.year,
+    vehicleMake: vehicle.make,
+    vehicleModel: vehicle.model,
+    vehiclePrice: vehicle.price 
+  });
 
   // Format currency
   const formatPrice = (price) => {
@@ -133,16 +143,72 @@ const VehicleDetailsModal = ({ vehicle, isOpen, onClose }) => {
     );
   };
 
+  console.log('About to render modal JSX with vehicle:', vehicle);
+
   return (
     <div className={`vehicle-details-modal ${isOpen ? 'open' : ''}`}>
+      {/* DEBUG - Should always be visible when modal is rendered */}
+      <div style={{
+        position: 'fixed',
+        top: '10px',
+        right: '10px',
+        background: 'red',
+        color: 'white',
+        padding: '10px',
+        zIndex: 9999,
+        fontSize: '12px'
+      }}>
+        MODAL RENDERED - isOpen: {isOpen ? 'TRUE' : 'FALSE'}
+      </div>
+      
       <div className="vehicle-details-container" ref={modalRef}>
         <button className="close-details-btn" onClick={onClose} aria-label="Close details">
           ×
         </button>
         
-        <div className="vehicle-details-header">
-          <h2>{vehicle.year} {vehicle.make} {vehicle.model}</h2>
-          <div className="vehicle-price-tag">{formatPrice(vehicle.price)}</div>
+        {/* New Header Section */}
+        <div className="modal-header" style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '20px 25px',
+          borderBottom: '2px solid #e5e7eb',
+          background: '#ffffff',
+          position: 'relative',
+          zIndex: 10,
+          width: '100%',
+          boxSizing: 'border-box'
+        }}>
+          <div className="modal-header-left" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px'
+          }}>
+            <span className="modal-year" style={{
+              fontSize: '1.1rem',
+              fontWeight: '600',
+              color: '#666666',
+              background: '#f5f5f5',
+              padding: '4px 8px',
+              borderRadius: '4px'
+            }}>{vehicle.year}</span>
+            <h2 className="modal-title" style={{
+              fontSize: '1.4rem',
+              fontWeight: '700',
+              color: '#333333',
+              margin: '0'
+            }}>{vehicle.make} {vehicle.model}</h2>
+          </div>
+          <div className="modal-header-right" style={{
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            <span className="modal-price" style={{
+              fontSize: '1.5rem',
+              fontWeight: '700',
+              color: '#2563eb'
+            }}>{formatPrice(vehicle.price)}</span>
+          </div>
         </div>
         
         <div className="vehicle-details-content">
@@ -279,17 +345,17 @@ const VehicleDetailsModal = ({ vehicle, isOpen, onClose }) => {
               
               <div className="vehicle-location">
                 <h3>Vehicle Location</h3>
-                <div className="map-placeholder" style={{ height: '150px', background: '#e0e0e0', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="map-placeholder">
                   <span>Map View</span>
                 </div>
               </div>
               
               <div className="additional-info">
-                <div className="info-item" style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between' }}>
+                <div className="info-item">
                   <span>Stock #:</span>
                   <span>{vehicle.stockNumber || 'N/A'}</span>
                 </div>
-                <div className="info-item" style={{ marginTop: '10px', display: 'flex', justifyContent: 'space-between' }}>
+                <div className="info-item">
                   <span>VIN:</span>
                   <span>{vehicle.vin || 'N/A'}</span>
                 </div>
