@@ -30,6 +30,41 @@
   padding: 0 2rem;
 }
 
+/* Links principales */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2.2rem;
+  margin-left: 3rem;
+}
+
+.nav-link {
+  background: none;
+  border: none;
+  font: 500 0.95rem/1 var(--font-primary,'Poppins',sans-serif);
+  letter-spacing: .4px;
+  color: rgba(255,255,255,.65);
+  cursor: pointer;
+  position: relative;
+  padding: .4rem .2rem;
+  transition: color .3s ease;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: -6px;
+  height: 2px; width: 0;
+  background: linear-gradient(90deg,var(--accent-primary,#6366f1),var(--accent-tertiary,#8b5cf6));
+  border-radius: 2px;
+  transition: width .4s cubic-bezier(.22,.8,.3,1);
+}
+
+.nav-link:hover { color: rgba(255,255,255,.9); }
+.nav-link:hover::after { width: 100%; }
+.nav-link.active { color: #fff; font-weight:600; }
+.nav-link.active::after { width:100%; }
+
 .logo-container {
   display: flex;
   align-items: center;
@@ -42,94 +77,6 @@
 }
 
 .logo-text {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: white;
-  letter-spacing: 0.5px;
-}
-
-.nav-links-desktop {
-  display: flex;
-  gap: 30px;
-}
-
-/* Aplica estilos a <a> y <button> para nav-link y mobile-nav-link */
-.nav-link, button.nav-link, .nav-link:visited, .nav-link:active, .nav-link:focus, .nav-link:disabled {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.7);
-  text-decoration: none;
-  font-size: 0.95rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  position: relative;
-  padding: 8px 0;
-  cursor: pointer;
-}
-
-.nav-link:hover, button.nav-link:hover {
-  color: white;
-}
-
-.nav-link::after, button.nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(to right, #4a4a65, #6a6a8a);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.nav-link:hover::after, button.nav-link:hover::after {
-  transform: scaleX(1);
-}
-
-.nav-link.active, button.nav-link.active {
-  color: white;
-}
-
-.nav-link.active::after, button.nav-link.active::after {
-  transform: scaleX(1);
-}
-
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.search-icon {
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  transition: color 0.3s ease, background 0.3s ease;
-  padding: 8px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.search-icon:hover {
-  color: white;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* Estilos para la barra de búsqueda */
-.search-bar {
-  display: flex;
-  align-items: center;
-  position: relative;
-  margin-right: 10px;
-}
-
-.search-bar form {
-  display: flex;
-  align-items: center;
   position: relative;
 }
 
@@ -143,6 +90,11 @@
   width: 240px;
   transition: all 0.3s ease;
 }
+
+.search-bar { position:relative; margin-right:1.2rem; }
+.search-icon { display:flex; align-items:center; justify-content:center; cursor:pointer; padding:.45rem; margin-left:1.2rem; border-radius:50%; transition:background .3s; position:relative; top:2px; }
+.search-icon:hover { background:rgba(255,255,255,.12); }
+.search-icon svg { display:block; }
 
 .search-input:focus {
   background-color: rgba(255, 255, 255, 0.15);
@@ -220,141 +172,15 @@
   color: white;
 }
 
-.menu-toggle {
-  display: none;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 30px;
-  height: 20px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  z-index: 110;
+/* Responsive: en pantallas muy pequeñas reducimos gap y ocultamos nombre para ahorrar espacio */
+@media (max-width: 860px) {
+  .nav-links { gap:1.4rem; margin-left:1.2rem; }
+  .user-name { display:none; }
 }
-
-.menu-toggle span {
-  width: 100%;
-  height: 2px;
-  background: white;
-  transition: all 0.3s ease;
-  transform-origin: center;
-}
-
-.menu-toggle.active span:first-child {
-  transform: translateY(9px) rotate(45deg);
-}
-
-.menu-toggle.active span:nth-child(2) {
-  opacity: 0;
-}
-
-.menu-toggle.active span:last-child {
-  transform: translateY(-9px) rotate(-45deg);
-}
-
-.mobile-menu {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(15, 15, 25, 0.97);
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-  backdrop-filter: blur(10px);
-}
-
-.mobile-menu.open {
-  opacity: 1;
-  visibility: visible;
-}
-
-.mobile-menu-links {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-}
-
-.mobile-nav-link, button.mobile-nav-link {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.7);
-  text-decoration: none;
-  font-size: 1.5rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  position: relative;
-  padding: 10px 0;
-  opacity: 0;
-  transform: translateY(20px);
-  cursor: pointer;
-}
-
-.mobile-menu.open .mobile-nav-link, .mobile-menu.open button.mobile-nav-link {
-  opacity: 1;
-  transform: translateY(0);
-  transition-delay: calc(0.1s * var(--i));
-}
-
-.mobile-nav-link:hover, button.mobile-nav-link:hover {
-  color: white;
-}
-
-.mobile-nav-link::after, button.mobile-nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%) scaleX(0);
-  width: 0;
-  height: 2px;
-  background: white;
-  transition: width 0.3s ease, transform 0.3s ease;
-}
-
-.mobile-nav-link:hover::after, button.mobile-nav-link:hover::after {
-  width: 100%;
-  transform: translateX(-50%) scaleX(1);
-}
-
-.mobile-nav-link.active, button.mobile-nav-link.active {
-  color: white;
-}
-
-.mobile-nav-link.active::after, button.mobile-nav-link.active::after {
-  width: 30%;
-  transform: translateX(-50%) scaleX(1);
-}
-
-.mobile-nav-link.logout, button.mobile-nav-link.logout {
-  margin-top: 20px;
-  color: #ff6b6b;
-}
-
-@media screen and (max-width: 992px) {
-  .nav-links-desktop {
-    display: none;
-  }
-  
-  .menu-toggle {
-    display: flex;
-  }
-  
-  .user-name {
-    display: none;
-  }
-  
-  .user-profile {
-    background: transparent;
-    padding: 0;
-  }
+@media (max-width: 620px) {
+  .nav-links { gap:1rem; margin-left:.8rem; }
+  .nav-link { font-size:.8rem; }
+  .search-input { width:170px; }
 }
 
 @media screen and

@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../styles/components/Navigation.css';
-import logo from '../assets/CarFinderLogo.png';
+import logo from '../assets/CarFinderLogo_white.png';
 
-const Navigation = () => {
+const Navigation = ({ onSearch = () => {} }) => {
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef(null);
@@ -46,7 +45,7 @@ const Navigation = () => {
     // Redirigir a la página principal con el parámetro de búsqueda
     // En una aplicación real podríamos usar React Router
     window.sessionStorage.setItem('carfinder-search', searchQuery.trim());
-    window.dispatchEvent(new Event('storage')); // Esto es para disparar un evento que el VehicleList pueda escuchar
+    onSearch(searchQuery.trim()); // comunicar directamente al padre
     
     // Ocultar la barra de búsqueda después de realizar la búsqueda
     setShowSearch(false);
@@ -56,6 +55,8 @@ const Navigation = () => {
   const handleCloseSearch = () => {
     setShowSearch(false);
     setSearchQuery('');
+    window.sessionStorage.removeItem('carfinder-search');
+    onSearch('');
   };
   
   return (
@@ -66,11 +67,20 @@ const Navigation = () => {
           <span className="logo-text">CarFinder</span>
         </div>
         
-        <div className="nav-links-desktop">
+        <div className="nav-links">
           <button className="nav-link active" type="button">Browse</button>
           <button className="nav-link" type="button">Saved Cars</button>
           <button className="nav-link" type="button">Compare</button>
-          <button className="nav-link" type="button" onClick={() => setShowSearch(true)}>Search</button>
+          <button 
+            className={`nav-link ${showSearch ? 'active' : ''}`}
+            type="button" 
+            onClick={() => {
+              setShowSearch(prev => !prev);
+              if (!showSearch) {
+                setTimeout(() => searchInputRef.current?.focus(), 20);
+              }
+            }}
+          >Search</button>
         </div>
         
         <div className="nav-right">
@@ -100,7 +110,7 @@ const Navigation = () => {
               </form>
             </div>
           ) : (
-            <div className="search-icon" onClick={handleSearchClick}>
+            <div className="search-icon" onClick={handleSearchClick} role="button" tabIndex={0} onKeyDown={(e)=> (e.key==='Enter') && handleSearchClick()} aria-label="Open search">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -113,28 +123,11 @@ const Navigation = () => {
             <span className="user-name">Julia Smith</span>
           </div>
           
-          <button 
-            className={`menu-toggle ${menuOpen ? 'active' : ''}`}
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
+          {/* Hamburguesa eliminada */}
         </div>
       </div>
       
-      <div className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
-        <div className="mobile-menu-links">
-          <button className="mobile-nav-link active" type="button">Browse</button>
-          <button className="mobile-nav-link" type="button">Saved Cars</button>
-          <button className="mobile-nav-link" type="button">Compare</button>
-          <button className="mobile-nav-link" type="button" onClick={() => {setShowSearch(true); setMenuOpen(false);}}>Search</button>
-          <button className="mobile-nav-link" type="button">Profile</button>
-          <button className="mobile-nav-link" type="button">Settings</button>
-          <button className="mobile-nav-link logout" type="button">Logout</button>
-        </div>
-      </div>
+  {/* Menú móvil eliminado */}
     </nav>
   );
 };

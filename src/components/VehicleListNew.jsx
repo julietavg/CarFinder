@@ -17,6 +17,7 @@ const VehicleList = () => {
   const [filteredVehicles, setFilteredVehicles] = useState([]);
   const [sortOption, setSortOption] = useState('newest');
   const [activeFilters, setActiveFilters] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleImageError = (vehicleId) => {
     setImageErrors(prev => ({
@@ -139,11 +140,21 @@ const VehicleList = () => {
     fetchVehicles();
   }, []);
 
-  // Efecto para aplicar filtros y ordenación
+  // Efecto para aplicar búsqueda, filtros y ordenación
   useEffect(() => {
     if (vehicles.length > 0) {
       // Empezamos con todos los vehículos
       let result = [...vehicles];
+      // Búsqueda
+      if (searchQuery.trim() !== '') {
+        const q = searchQuery.toLowerCase().trim();
+        result = result.filter(v => (
+          v.make.toLowerCase().includes(q) ||
+          v.model.toLowerCase().includes(q) ||
+          v.year.toString().includes(q) ||
+          (v.submodel && v.submodel.toLowerCase().includes(q))
+        ));
+      }
       
       // Aplicamos los filtros si existen
       if (activeFilters) {
@@ -194,7 +205,7 @@ const VehicleList = () => {
       
       setFilteredVehicles(result);
     }
-  }, [vehicles, sortOption, activeFilters]);
+  }, [vehicles, sortOption, activeFilters, searchQuery]);
 
   const handleViewDetails = (vehicleId) => {
     console.log('View details for vehicle:', vehicleId);
@@ -239,7 +250,7 @@ const VehicleList = () => {
   return (
     <div className="vehicle-list-container">
       <Particles />
-      <Navigation />
+  <Navigation onSearch={setSearchQuery} />
       
       {selectedVehicle && (
         <VehicleDetails 
@@ -275,6 +286,18 @@ const VehicleList = () => {
             <div className="vehicle-controls">
               <FilterPanel onFilterChange={handleFilterChange} />
               
+              {searchQuery && (
+                <div className="active-search">
+                  <span>Search results for: <strong>"{searchQuery}"</strong></span>
+                  <button onClick={() => { setSearchQuery(''); }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+              )}
+
               {filteredVehicles.length > 0 && (
                 <div className="sort-controls">
                   <div className="search-results-info">
@@ -306,9 +329,13 @@ const VehicleList = () => {
                   </svg>
                 </div>
                 <h2>No matching vehicles found</h2>
-                <p>Try adjusting your search filters to find what you're looking for.</p>
+                {searchQuery ? (
+                  <p>No results for "{searchQuery}". Try another term or clear filters.</p>
+                ) : (
+                  <p>Try adjusting your search filters to find what you're looking for.</p>
+                )}
                 <button className="clear-filters-btn" onClick={resetFilters}>
-                  Clear All Filters
+                  {searchQuery ? 'Clear Search & Filters' : 'Clear All Filters'}
                 </button>
               </div>
             ) : (
@@ -327,30 +354,35 @@ const VehicleList = () => {
                         />
                       </div>
                       <div className="vehicle-info">
-                        <h3>{vehicle.make}-{vehicle.model} {vehicle.year}</h3>
-                        <h4>{vehicle.submodel}</h4>
-                        <p className="vehicle-price">${vehicle.price.toLocaleString()}.00</p>
+                        <div className="vehicle-title">
+                          <span className="vehicle-make">{vehicle.make}</span>
+                          <span className="vehicle-model">{vehicle.model} <span className="vehicle-year">{vehicle.year}</span></span>
+                          {vehicle.submodel && <span className="vehicle-submodel">{vehicle.submodel}</span>}
+                        </div>
+                        <div className="vehicle-price-row">
+                          <span className="vehicle-price">${vehicle.price.toLocaleString()}</span>
+                        </div>
                         <div className="vehicle-actions">
+                          <button 
+                            className="action-btn details-btn" 
+                            onClick={() => handleViewDetails(vehicle.id)}
+                            style={{animationDelay: `${0.6 + index * 0.15}s`}}
+                          >
+                            Details
+                          </button>
                           <button 
                             className="action-btn edit-btn" 
                             onClick={() => handleEdit(vehicle.id)}
-                            style={{animationDelay: `${0.6 + index * 0.15}s`}}
+                            style={{animationDelay: `${0.7 + index * 0.15}s`}}
                           >
-                            Edit Vehicle
+                            Edit
                           </button>
                           <button 
                             className="action-btn delete-btn" 
                             onClick={() => handleDelete(vehicle.id)}
-                            style={{animationDelay: `${0.7 + index * 0.15}s`}}
-                          >
-                            Delete Vehicle
-                          </button>
-                          <button 
-                            className="action-btn details-btn" 
-                            onClick={() => handleViewDetails(vehicle.id)}
                             style={{animationDelay: `${0.8 + index * 0.15}s`}}
                           >
-                            More Details...
+                            Delete
                           </button>
                         </div>
                       </div>

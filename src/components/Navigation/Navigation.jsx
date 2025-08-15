@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import ThemeToggle from '../ThemeToggle/ThemeToggle';
 import Assets from '../../assets';
-import '../styles/components/Navigation.css';
+import './Navigation.css';
 
 const Navigation = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const toggleMenu = () => {
-    setMenuOpen(prev => !prev);
+  const handleSearch = (e) => {
+    e.preventDefault();
+    console.log('Searching for:', searchQuery);
   };
 
   return (
@@ -16,6 +17,44 @@ const Navigation = () => {
         <div className="logo-container">
           <img src={Assets.logo} alt="CarFinder Logo" className="logo" />
           <h1 className="app-title">CarFinder</h1>
+        </div>
+
+        <form onSubmit={handleSearch} className="search-container" style={{ margin: '0 20px', minWidth: '300px' }}>
+          <input
+            type="text"
+            style={{
+              width: '100%',
+              padding: '8px 35px 8px 15px',
+              borderRadius: '20px',
+              border: '1px solid #ccc'
+            }}
+            placeholder="Search cars..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <button 
+            type="submit" 
+            style={{
+              position: 'absolute',
+              right: '10px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+            aria-label="Search"
+          >
+            <img src={Assets.icons.search} alt="" style={{ width: '16px', height: '16px' }} />
+          </button>
+        </form>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div className="user-profile" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <img src={Assets.icons.user} alt="" style={{ width: '20px', height: '20px' }} />
+            <span>Julia Smith</span>
+          </div>
+          <ThemeToggle />
         </div>
 
         <div className="mobile-nav">
@@ -29,22 +68,6 @@ const Navigation = () => {
             <span className="menu-icon"></span>
           </button>
         </div>
-
-        <ul className={`nav-links ${menuOpen ? 'menu-open' : ''}`}>
-          <li><a href="#home" className="nav-link">Home</a></li>
-          <li><a href="#search" className="nav-link">Search Cars</a></li>
-          <li><a href="#dealers" className="nav-link">Dealers</a></li>
-          <li><a href="#about" className="nav-link">About Us</a></li>
-          <li className="nav-button">
-            <a href="#login" className="login-button">
-              <img src={Assets.icons.user} alt="" className="icon" />{' '}
-              Login
-            </a>
-          </li>
-          <li className="theme-toggle-container desktop-only">
-            <ThemeToggle />
-          </li>
-        </ul>
       </div>
     </nav>
   );

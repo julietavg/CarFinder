@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
-import './Login.css';
+import React, { useState, useEffect } from 'react';
+import '../../styles/components/Login.css';
+import logo from '../../assets/CarFinderLogo.png';
 
 const Login = ({ onLogin }) => {
+  // Efecto de animación al cargar
+  useEffect(() => {
+    document.body.classList.add('login-page');
+    return () => {
+      document.body.classList.remove('login-page');
+    };
+  }, []);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -16,7 +23,7 @@ const Login = ({ onLogin }) => {
       return;
     }
     setLoading(true);
-    // Simulación de autenticación (reemplazar por llamada real al backend)
+    // Aquí irá la llamada real al backend
     setTimeout(() => {
       setLoading(false);
       if (username === 'admin' && password === 'admin123') {
@@ -28,38 +35,37 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-box">
-        <h2>Sign in</h2>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
-            autoFocus
-          />
-          <div className="password-wrapper">
+    <div className="login-bg">
+      <div className="login-header">
+        <img src={logo} alt="CarFinder Logo" className="login-logo" />
+      </div>
+      <div className="login-container">
+        <div className="login-box">
+          <h2>Sign in</h2>
+          <form onSubmit={handleSubmit} autoComplete="off">
             <input
-              type={showPassword ? 'text' : 'password'}
+              type="text"
+              placeholder="Email address"
+              value={username}
+              onChange={e => setUsername(e.target.value)}
+              autoFocus
+            />
+            <input
+              type="password"
               placeholder="Password"
               value={password}
               onChange={e => setPassword(e.target.value)}
             />
-            <button
-              type="button"
-              className="show-hide"
-              onClick={() => setShowPassword(v => !v)}
-              tabIndex={-1}
-            >
-              {showPassword ? 'Hide' : 'Show'}
+            {error && <div className="error-message">{error}</div>}
+            <button type="submit" className="login-btn" disabled={loading}>
+              {loading ? (
+                <span className="dots-spinner" aria-label="Cargando">
+                  <span></span><span></span><span></span>
+                </span>
+              ) : 'Sign in'}
             </button>
-          </div>
-          {error && <div className="error-message">{error}</div>}
-          <button type="submit" className="login-btn" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign in'}
-          </button>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );

@@ -140,27 +140,10 @@ const VehicleList = () => {
     fetchVehicles();
   }, []);
 
-  // Efecto para detectar cambios en la búsqueda de sessionStorage
+  // Inicializar búsqueda desde sessionStorage al montar
   useEffect(() => {
-    const handleStorageChange = () => {
-      const searchFromStorage = window.sessionStorage.getItem('carfinder-search');
-      if (searchFromStorage) {
-        setSearchQuery(searchFromStorage);
-      }
-    };
-
-    // Escuchar el evento de almacenamiento
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Comprobar si ya hay algo en el sessionStorage
     const initialSearch = window.sessionStorage.getItem('carfinder-search');
-    if (initialSearch) {
-      setSearchQuery(initialSearch);
-    }
-    
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
+    if (initialSearch) setSearchQuery(initialSearch);
   }, []);
 
   // Efecto para aplicar filtros, búsqueda y ordenación
@@ -404,7 +387,7 @@ const VehicleList = () => {
   return (
     <div className="vehicle-list-container">
       <Particles />
-      <Navigation />
+  <Navigation onSearch={(q) => setSearchQuery(q)} />
       
       {selectedVehicle && (
         <VehicleDetails 
