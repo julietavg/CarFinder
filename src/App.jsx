@@ -7,15 +7,13 @@ import { PageTransitionProvider } from './contexts/PageTransitionContext';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Mostrar login al inicio
-  
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
+  const handleLogin = () => setIsLoggedIn(true);
+  const handleLogout = () => setIsLoggedIn(false);
 
   return (
     <ThemeProvider>
       <PageTransitionProvider>
-        {isLoggedIn ? <VehicleList /> : <Login onLogin={handleLogin} />}
+  {isLoggedIn ? <VehicleList onLogout={handleLogout} /> : <Login onLogin={handleLogin} />}
       </PageTransitionProvider>
     </ThemeProvider>
   );

@@ -65,6 +65,83 @@
   transform: scale(1.1);
 }
 
+/* Modal Header Styles */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(40, 40, 60, 0.8), rgba(30, 30, 45, 0.8));
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-year {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #aaaaaa;
+  background: rgba(60, 60, 80, 0.6);
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header-right {
+  display: flex;
+  align-items: center;
+}
+
+.modal-price {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #ffffff;
+  background: linear-gradient(90deg, #3a3a50, #5a5a75);
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive adjustments for header */
+@media (max-width: 768px) {
+  .modal-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+    padding: 15px 20px;
+  }
+  
+  .modal-header-left {
+    justify-content: center;
+  }
+  
+  .modal-title {
+    font-size: 1.3rem;
+  }
+  
+  .modal-price {
+    font-size: 1.2rem;
+    padding: 8px 15px;
+  }
+}
+
 .vehicle-details-header {
   display: flex;
   flex-direction: column;
@@ -692,21 +769,23 @@
 .vehicle-details-main {
   display: flex;
   flex-direction: row;
-  gap: 2rem;
-  margin-bottom: 2rem;
-  max-height: calc(70vh - 120px);
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  max-height: calc(80vh - 100px);
+  padding-top: 10px;
 }
 
 .vehicle-image-wrapper {
   width: 50%;
   display: flex;
   flex-direction: column;
+  padding-left: 10px;
+  justify-content: center;
 }
 
 .vehicle-image-container {
   width: 100%;
-  height: 100%;
-  max-height: 350px;
+  height: 320px;
   overflow: hidden;
   border-radius: 8px;
   position: relative;
@@ -742,7 +821,7 @@
 }
 
 .image-caption {
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   display: flex;
   justify-content: center;
 }
@@ -765,28 +844,28 @@
 .info-section {
   background: rgba(30, 30, 50, 0.2);
   border-radius: 8px;
-  padding: 1rem;
+  padding: 0.8rem;
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .info-section-title {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
-  margin-bottom: 1.2rem;
+  margin-bottom: 0.8rem;
   color: #ddd;
   position: relative;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.4rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .info-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.8rem;
+  gap: 0.6rem;
 }
 
 .info-item {
-  padding: 0.8rem;
+  padding: 0.6rem;
   background: rgba(20, 20, 40, 0.4);
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.03);
@@ -819,9 +898,9 @@
 .vehicle-details-actions {
   display: flex;
   justify-content: center;
-  gap: 1.5rem;
-  margin-top: 2.5rem;
-  padding-top: 1.5rem;
+  gap: 1.2rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -829,13 +908,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.8rem 1.8rem;
+  padding: 0.8rem 2.5rem;
   font-size: 1rem;
   font-weight: 500;
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-width: 160px;
+  min-width: 180px;
 }
 
 .btn-icon {

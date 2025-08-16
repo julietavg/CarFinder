@@ -9,6 +9,10 @@ const VehicleForm = ({ vehicle, onClose, onSave }) => {
     submodel: '',
     price: '',
     image: '',
+  transmission: 'Automatic',
+    mileage: '',
+    color: '',
+    vin: '',
   });
   
   const [showForm, setShowForm] = useState(false);
@@ -26,6 +30,12 @@ const VehicleForm = ({ vehicle, onClose, onSave }) => {
         submodel: vehicle.submodel || '',
         price: vehicle.price || '',
         image: vehicle.image || '',
+        transmission: vehicle.transmission === 'Manual' || vehicle.transmission === 'Automatic'
+          ? vehicle.transmission
+          : 'Automatic',
+        mileage: vehicle.mileage || '',
+        color: vehicle.color || '',
+        vin: vehicle.vin || '',
       });
       setIsEditing(true);
     }
@@ -42,13 +52,20 @@ const VehicleForm = ({ vehicle, onClose, onSave }) => {
       onClose();
     }, 400);
   };
+
+  const handleOverlayClick = (e) => {
+    // Si el click es en el overlay (fondo) y no en el contenido del modal
+    if (e.target === e.currentTarget) {
+      handleClose();
+    }
+  };
   
   const handleChange = (e) => {
     const { name, value } = e.target;
     
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'price' ? value.replace(/[^\d]/g, '') : value,
+      [name]: (name === 'price' || name === 'mileage') ? value.replace(/[^\d]/g, '') : value,
     }));
     
     // Limpiar errores de validación cuando el usuario escribe
@@ -63,21 +80,12 @@ const VehicleForm = ({ vehicle, onClose, onSave }) => {
   const validateForm = () => {
     const errors = {};
     
-    if (!formData.make.trim()) {
-      errors.make = 'Make is required';
-    }
-    
-    if (!formData.model.trim()) {
-      errors.model = 'Model is required';
-    }
-    
-    if (!formData.year || formData.year < 1900 || formData.year > new Date().getFullYear() + 1) {
+    // Solo validaciones de formato, no de campos obligatorios
+    if (formData.year && (formData.year < 1900 || formData.year > new Date().getFullYear() + 1)) {
       errors.year = `Year must be between 1900 and ${new Date().getFullYear() + 1}`;
     }
     
-    if (!formData.price) {
-      errors.price = 'Price is required';
-    } else if (parseInt(formData.price) <= 0) {
+    if (formData.price && parseInt(formData.price) <= 0) {
       errors.price = 'Price must be greater than zero';
     }
     
@@ -96,8 +104,9 @@ const VehicleForm = ({ vehicle, onClose, onSave }) => {
     // Prepare data for submission
     const vehicleData = {
       ...formData,
-      price: parseInt(formData.price),
-      year: parseInt(formData.year),
+      price: formData.price ? parseInt(formData.price) : 0,
+      year: formData.year ? parseInt(formData.year) : new Date().getFullYear(),
+      mileage: formData.mileage ? parseInt(formData.mileage) : null,
       id: isEditing && vehicle ? vehicle.id : Date.now(), // Use existing ID when editing
     };
     
@@ -111,7 +120,7 @@ const VehicleForm = ({ vehicle, onClose, onSave }) => {
   };
   
   return (
-    <div className={`vehicle-form-overlay ${showForm ? 'show' : ''}`}>
+    <div className={`vehicle-form-overlay ${showForm ? 'show' : ''}`} onClick={handleOverlayClick}>
       <div className="vehicle-form-container">
         <button className="close-form-btn" onClick={handleClose}>×</button>
         
@@ -121,11 +130,22 @@ const VehicleForm = ({ vehicle, onClose, onSave }) => {
         </div>
         
         <form onSubmit={handleSubmit} className="vehicle-form">
+          <div className="form-group">
+            <label htmlFor="vin">VIN</label>
+            <input
+              type="text"
+              id="vin"
+              name="vin"
+              placeholder="e.g. 1HGBH41JXMN109186"
+              value={formData.vin}
+              onChange={handleChange}
+              disabled={formSubmitted}
+            />
+          </div>
+          
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="make">
-                Make <span className="required">*</span>
-              </label>
+              <label htmlFor="make">Make</label>
               <input
                 type="text"
                 id="make"
@@ -142,9 +162,7 @@ const VehicleForm = ({ vehicle, onClose, onSave }) => {
             </div>
             
             <div className="form-group">
-              <label htmlFor="model">
-                Model <span className="required">*</span>
-              </label>
+              <label htmlFor="model">Model</label>
               <input
                 type="text"
                 id="model"
@@ -163,9 +181,7 @@ const VehicleForm = ({ vehicle, onClose, onSave }) => {
           
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="year">
-                Year <span className="required">*</span>
-              </label>
+              <label htmlFor="year">Year</label>
               <input
                 type="number"
                 id="year"
@@ -197,26 +213,69 @@ const VehicleForm = ({ vehicle, onClose, onSave }) => {
             </div>
           </div>
           
-          <div className="form-group">
-            <label htmlFor="price">
-              Price <span className="required">*</span>
-            </label>
-            <div className="price-input-container">
-              <span className="price-symbol">$</span>
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="transmission">Transmission</label>
+              <select
+                id="transmission"
+                name="transmission"
+                value={formData.transmission}
+                onChange={handleChange}
+                disabled={formSubmitted}
+              >
+                <option value="Automatic">Automatic</option>
+                <option value="Manual">Manual</option>
+              </select>
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="mileage">Mileage</label>
               <input
                 type="text"
-                id="price"
-                name="price"
-                placeholder="e.g. 35000"
-                value={formData.price}
+                id="mileage"
+                name="mileage"
+                placeholder="e.g. 25000"
+                value={formData.mileage}
                 onChange={handleChange}
-                className={`price-input ${validationErrors.price ? 'error' : ''}`}
+                disabled={formSubmitted}
+              />
+              <small className="field-hint">Enter mileage in miles</small>
+            </div>
+          </div>
+          
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="color">Color</label>
+              <input
+                type="text"
+                id="color"
+                name="color"
+                placeholder="e.g. Red, Blue, Black"
+                value={formData.color}
+                onChange={handleChange}
                 disabled={formSubmitted}
               />
             </div>
-            {validationErrors.price && (
-              <span className="error-message">{validationErrors.price}</span>
-            )}
+            
+            <div className="form-group">
+              <label htmlFor="price">Price</label>
+              <div className="price-input-container">
+                <span className="price-symbol">$</span>
+                <input
+                  type="text"
+                  id="price"
+                  name="price"
+                  placeholder="e.g. 35000"
+                  value={formData.price}
+                  onChange={handleChange}
+                  className={`price-input ${validationErrors.price ? 'error' : ''}`}
+                  disabled={formSubmitted}
+                />
+              </div>
+              {validationErrors.price && (
+                <span className="error-message">{validationErrors.price}</span>
+              )}
+            </div>
           </div>
           
           <div className="form-group">

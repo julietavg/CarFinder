@@ -1,35 +1,83 @@
 import React, { useState, useRef, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import '../styles/components/FilterPanel.css';
 
-const FilterPanel = ({ onFilterChange }) => {
+const FilterPanel = ({ onFilterChange, vehicles = [] }) => {
   const [expanded, setExpanded] = useState(false);
+
+  // Derivar catálogos dinámicos desde vehicles
+  const derivedMakes = React.useMemo(() => {
+    const set = new Set();
+    vehicles.forEach(v => { if (v.make) set.add(v.make); });
+    return Array.from(set).sort();
+  }, [vehicles]);
+
+  const derivedModels = React.useMemo(() => {
+    const set = new Set();
+    vehicles.forEach(v => { if (v.model) set.add(v.model); });
+    return Array.from(set).sort();
+  }, [vehicles]);
+
+  const priceBounds = React.useMemo(() => {
+    if (!vehicles.length) return { min: 0, max: 300000 };
+    let min = Infinity, max = -Infinity;
+    vehicles.forEach(v => {
+      if (typeof v.price === 'number') {
+        if (v.price < min) min = v.price;
+        if (v.price > max) max = v.price;
+      }
+    });
+  if (!isFinite(min)) min = 0;
+  if (!isFinite(max)) max = 0;
+    // Ajuste a múltiplos de 1000 para slider más limpio
+    min = Math.floor(min / 1000) * 1000;
+    max = Math.ceil(max / 1000) * 1000;
+    if (min === max) { min = 0; max = max || 100000; }
+    return { min, max };
+  }, [vehicles]);
+
+  const yearBounds = React.useMemo(() => {
+    if (!vehicles.length) return { min: 1990, max: new Date().getFullYear() };
+    let min = Infinity, max = -Infinity;
+    vehicles.forEach(v => {
+      if (typeof v.year === 'number') {
+        if (v.year < min) min = v.year;
+        if (v.year > max) max = v.year;
+      }
+    });
+  if (!isFinite(min)) min = 1990;
+  if (!isFinite(max)) max = new Date().getFullYear();
+    return { min, max };
+  }, [vehicles]);
+
   const [filters, setFilters] = useState({
-    priceRange: [0, 300000],
-    years: [2000, new Date().getFullYear()],
+    priceRange: [priceBounds.min, priceBounds.max],
+    years: [yearBounds.min, yearBounds.max],
     makes: [],
-    models: [],
-    features: []
+    models: []
   });
+
+  // Si cambian los bounds (porque cargaron vehículos) reseteamos rangos manteniendo selecciones de makes/models
+  useEffect(() => {
+    setFilters(prev => ({
+      ...prev,
+      priceRange: [priceBounds.min, priceBounds.max],
+      years: [yearBounds.min, yearBounds.max]
+    }));
+  }, [priceBounds.min, priceBounds.max, yearBounds.min, yearBounds.max]);
   
   const filterRef = useRef(null);
   
-  // Datos de ejemplo para filtros
-  const availableMakes = ['FORD', 'CHEVROLET', 'DODGE', 'PORSCHE', 'BMW', 'AUDI', 'MERCEDES', 'TOYOTA'];
-  const availableModels = ['MUSTANG', 'CAMARO', 'CHALLENGER', '911', 'M3', 'A4', 'C-CLASS', 'COROLLA'];
-  const availableFeatures = [
-    'Leather Seats', 
-    'Navigation', 
-    'Bluetooth', 
-    'Backup Camera', 
-    'Sunroof', 
-    'Heated Seats', 
-    'Remote Start', 
-    'Apple CarPlay',
-    'Android Auto',
-    'Blind Spot Monitoring',
-    'Lane Assist',
-    'Adaptive Cruise Control'
-  ];
+  // Catálogos disponibles (dinámicos)
+  const availableMakes = derivedMakes;
+  // Filtrar modelos según makes seleccionados (si hay selección) para UX mejor
+  const availableModels = React.useMemo(() => {
+    if (filters.makes.length === 0) return derivedModels;
+    const set = new Set();
+    vehicles.forEach(v => { if (filters.makes.includes(v.make)) set.add(v.model); });
+    return Array.from(set).sort();
+  }, [derivedModels, filters.makes, vehicles]);
+  // Features removidos según solicitud
   
   // Manejar clic fuera del panel para cerrarlo
   useEffect(() => {
@@ -59,7 +107,7 @@ const FilterPanel = ({ onFilterChange }) => {
     if (filters.years[1] < new Date().getFullYear()) count++;
     if (filters.makes.length > 0) count++;
     if (filters.models.length > 0) count++;
-    if (filters.features.length > 0) count++;
+  // features removidos
     
     return count;
     */
@@ -134,17 +182,14 @@ const FilterPanel = ({ onFilterChange }) => {
   };
   
   const handleResetFilters = () => {
-    setFilters({
-      priceRange: [0, 300000],
-      years: [2000, new Date().getFullYear()],
+    const reset = {
+      priceRange: [priceBounds.min, priceBounds.max],
+      years: [yearBounds.min, yearBounds.max],
       makes: [],
-      models: [],
-      features: []
-    });
-    
-    if (onFilterChange) {
-      onFilterChange(null);
-    }
+  models: []
+    };
+    setFilters(reset);
+    if (onFilterChange) onFilterChange(null);
   };
   
   const formatPrice = (value) => {
@@ -187,8 +232,8 @@ const FilterPanel = ({ onFilterChange }) => {
                 <input
                   type="range"
                   id="min-price"
-                  min="0"
-                  max="300000"
+                  min={priceBounds.min}
+                  max={priceBounds.max}
                   step="5000"
                   value={filters.priceRange[0]}
                   onChange={(e) => handlePriceChange(e, 0)}
@@ -200,8 +245,8 @@ const FilterPanel = ({ onFilterChange }) => {
                 <input
                   type="range"
                   id="max-price"
-                  min="0"
-                  max="300000"
+                  min={priceBounds.min}
+                  max={priceBounds.max}
                   step="5000"
                   value={filters.priceRange[1]}
                   onChange={(e) => handlePriceChange(e, 1)}
@@ -219,8 +264,8 @@ const FilterPanel = ({ onFilterChange }) => {
                 <input
                   type="range"
                   id="min-year"
-                  min="1990"
-                  max={new Date().getFullYear()}
+                  min={yearBounds.min}
+                  max={yearBounds.max}
                   step="1"
                   value={filters.years[0]}
                   onChange={(e) => handleYearChange(e, 0)}
@@ -232,8 +277,8 @@ const FilterPanel = ({ onFilterChange }) => {
                 <input
                   type="range"
                   id="max-year"
-                  min="1990"
-                  max={new Date().getFullYear()}
+                  min={yearBounds.min}
+                  max={yearBounds.max}
                   step="1"
                   value={filters.years[1]}
                   onChange={(e) => handleYearChange(e, 1)}
@@ -277,22 +322,7 @@ const FilterPanel = ({ onFilterChange }) => {
             </div>
           </div>
           
-          <div className="filter-section">
-            <h4>Features</h4>
-            <div className="checkbox-group">
-              {availableFeatures.map(feature => (
-                <div className="checkbox-item" key={feature}>
-                  <input
-                    type="checkbox"
-                    id={`feature-${feature.replace(/\s+/g, '-').toLowerCase()}`}
-                    checked={filters.features.includes(feature)}
-                    onChange={(e) => handleCheckboxChange(e, 'features', feature)}
-                  />
-                  <label htmlFor={`feature-${feature.replace(/\s+/g, '-').toLowerCase()}`}>{feature}</label>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Features removidos */}
         </div>
         
         <div className="filter-actions">
@@ -305,3 +335,14 @@ const FilterPanel = ({ onFilterChange }) => {
 };
 
 export default FilterPanel;
+
+FilterPanel.propTypes = {
+  onFilterChange: PropTypes.func,
+  vehicles: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    make: PropTypes.string,
+    model: PropTypes.string,
+    year: PropTypes.number,
+    price: PropTypes.number
+  }))
+};
