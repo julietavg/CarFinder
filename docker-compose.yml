@@ -4,8 +4,8 @@ services:
   frontend:
     build:
       context: ./carfinder-ui
-      Dockerfile: Dockerfile
-    image: 10.83.64.110:8085/carfinder-ui::v1.0.0
+      dockerfile: dockerfile
+    image: 192.168.1.72:8085/carfinder-ui:latest
     container_name: carfinder_frontend
     # Remove ports and depends_on since we're just building/pushing
     networks:
@@ -14,8 +14,8 @@ services:
   backend:
     build:
       context: ./carfinder
-      Dockerfile: Dockerfile
-    image: 10.83.64.110:8085/carfinder-api::v1.0.0
+      dockerfile: dockerfile
+    image: 192.168.1.72:8085/carfinder-api:latest
     container_name: carfinder_backend
     # Remove ports and environment since we're just building/pushing
     networks:
