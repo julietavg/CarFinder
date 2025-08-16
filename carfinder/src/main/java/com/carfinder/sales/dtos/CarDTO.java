@@ -16,21 +16,23 @@ public class CarDTO {
     @Schema(description = "Vehicle Identification Number", example = "1HGCM82633A004352")
     @NotBlank(message = "VIN is required")
     @Size(min = 17, max = 17, message = "VIN must be exactly 17 characters")
-    // Digits only and capital letters excluding I, O, Q
-    @Pattern(regexp = "^[A-HJ-NPR-Z0-9]{17}$",
-            message = "VIN must be alphanumeric (A-H,J-N,P,R-Z,0-9) without I, O or Q")
+    @Pattern(regexp = "^[A-HJ-NPR-Z0-9]{17}$", message = "VIN must be alphanumeric (A-H,J-N,P,R-Z,0-9) without I, O or Q")
     private String vin;
 
     @Schema(description = "Car manufacturer", example = "Toyota")
     @NotBlank(message = "Make is required")
+    @Size(max = 50, message = "Make must not exceed 50 characters")
     private String make;
 
     @Schema(description = "Car model", example = "Corolla")
     @NotBlank(message = "Model is required")
+    @Size(max = 50, message = "Model must not exceed 50 characters")
+    @Pattern(regexp = "^[a-zA-Z0-9\\s-]+$", message = "Model can only contain alphanumeric characters, spaces, and hyphens")
     private String model;
 
     @Schema(description = "Car sub-model", example = "EX")
     @NotBlank(message = "SubModel is required")
+    @Size(max = 50, message = "SubModel must not exceed 50 characters")
     private String subModel;
 
     @Schema(description = "Year of manufacture", example = "2020")
@@ -46,10 +48,12 @@ public class CarDTO {
 
     @Schema(description = "Color of the car", example = "Red")
     @NotBlank(message = "Color is required")
+    @Size(max = 30, message = "Color must not exceed 30 characters")
     private String color;
 
     @Schema(description = "Transmission type", example = "Automatic")
     @NotBlank(message = "Transmission is required")
+    @Size(max = 30, message = "Transmission must not exceed 30 characters")
     private String transmission;
 
     @Schema(description = "Price in USD", example = "15000.00")

@@ -5,8 +5,8 @@ services:
   backend-build:
     build:
       context: ./carfinder
-      dockerfile: dockerfile
-    image: 192.168.1.72:/carfinder-api:latest
+      Dockerfile: Dockerfile
+    image: 192.168.1.72:/carfinder-api::v1.0.0
     container_name: carfinder_backend_build
     profiles:
       - build
@@ -15,8 +15,8 @@ services:
   frontend-build:
     build:
       context: ./carfinder-ui
-      dockerfile: dockerfile
-    image: 192.168.1.72:carfinder-ui:latest
+      Dockerfile: Dockerfile
+    image: 192.168.1.72:carfinder-ui::v1.0.0
     container_name: carfinder_frontend_build
     profiles:
       - build
