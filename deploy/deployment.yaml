@@ -65,3 +65,6 @@ spec:
               value: "carfinder_user"
             - name: MYSQL_PASSWORD
               value: "carfinder_pass"
+              # Add this to make table names case-insensitive
+            - name: MYSQL_LOWER_CASE_TABLE_NAMES
+              value: "1"
