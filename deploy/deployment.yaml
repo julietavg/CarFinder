@@ -28,6 +28,12 @@ spec:
               value: "mysql-service"
             - name: DB_PORT
               value: "3306"
+            - name: DB_NAME
+              value: "carfinder"
+            - name: DB_USER
+              value: "carfinder_user"
+            - name: DB_PASSWORD
+              value: "carfinder_pass"
 ---
 apiVersion: apps/v1
 kind: Deployment
