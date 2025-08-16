@@ -21,9 +21,9 @@
 }
 
 .nav-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* logo | center area | right side */
   align-items: center;
-  justify-content: space-between;
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
@@ -35,7 +35,9 @@
   display: flex;
   align-items: center;
   gap: 2.2rem;
-  margin-left: 3rem;
+  padding: 10px;
+  margin-left: 0; /* remove left offset so it can center precisely */
+  justify-self: center; /* center within middle grid column */
 }
 
 .nav-link {
@@ -64,6 +66,8 @@
 .nav-link:hover::after { width: 100%; }
 .nav-link.active { color: #fff; font-weight:600; }
 .nav-link.active::after { width:100%; }
+
+/* Add Vehicle special link (styles removed for cleanliness; restore if needed) */
 
 .logo-container {
   display: flex;
@@ -179,7 +183,7 @@
   .user-name { display:none; }
 }
 @media (max-width: 620px) {
-  .nav-links { gap:1rem; margin-left:.8rem; }
+  .nav-links { gap:1rem; }
   .nav-link { font-size:.8rem; }
   .search-input { width:170px; }
 }

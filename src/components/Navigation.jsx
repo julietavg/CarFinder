@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import '../styles/components/Navigation.css';
 import logo from '../assets/CarFinderLogo_white.png';
 
-const Navigation = ({ onSearch = () => {} }) => {
+const Navigation = ({ onSearch = () => {}, onAddVehicle = () => {} }) => {
   const [scrolled, setScrolled] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -35,7 +35,7 @@ const Navigation = ({ onSearch = () => {} }) => {
     e.preventDefault();
     if (searchQuery.trim() === '') return;
     
-    console.log('Buscando:', searchQuery);
+    console.log('Searching:', searchQuery);
     
     // Redirigir a la página principal con el parámetro de búsqueda
     // En una aplicación real podríamos usar React Router
@@ -59,13 +59,12 @@ const Navigation = ({ onSearch = () => {} }) => {
       <div className="nav-container">
         <div className="logo-container">
           <img src={logo} alt="CarFinder Logo" className="nav-logo" />
-          <span className="logo-text">CarFinder</span>
         </div>
         
         <div className="nav-links">
           <button className="nav-link active" type="button">Browse</button>
           <button className="nav-link" type="button">Saved Cars</button>
-          <button className="nav-link" type="button">Compare</button>
+          <button className="nav-link add-link" type="button" onClick={() => onAddVehicle()}>Add Vehicle</button>
         </div>
         
         <div className="nav-right">

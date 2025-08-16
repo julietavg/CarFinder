@@ -192,7 +192,7 @@ const VehicleList = () => {
   return (
     <div className="vehicle-list-container">
       <Particles />
-      <Navigation onSearch={setSearchQuery} />
+  <Navigation onSearch={setSearchQuery} onAddVehicle={() => handleVehicleAction('add')} />
       
       {selectedVehicle && (
         <VehicleDetails 

@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 /* Spinner de puntos animados para el login */
 .dots-spinner {
   display: inline-flex;
@@ -26,7 +27,6 @@
   40% { transform: translateY(-7px); opacity: 1; }
 }
 /* Login.css */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
   --primary-color: #1a1a1a;
