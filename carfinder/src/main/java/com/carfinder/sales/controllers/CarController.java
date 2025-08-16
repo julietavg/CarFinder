@@ -56,9 +56,11 @@ public class CarController {
     // ✅ Delete a car by ID — ADMIN only
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCar(@PathVariable Long id) {
+    public ResponseEntity<?> deleteCar(@PathVariable Long id) {
         carService.deleteCar(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of(
+                "message", "Car id " + id + " has been deleted successfully."
+        ));
     }
 
     // ✅ Get all cars — ADMIN or USER
