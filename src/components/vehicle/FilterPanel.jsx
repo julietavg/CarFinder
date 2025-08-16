@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import '../styles/components/FilterPanel.css';
+import '../../styles/components/FilterPanel.css';
 
 const FilterPanel = ({ onFilterChange, vehicles = [] }) => {
   const [expanded, setExpanded] = useState(false);

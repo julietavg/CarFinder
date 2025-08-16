@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/components/ConfirmationModal.css';
+import '../../styles/components/ConfirmationModal.css';
 
 const ConfirmationModal = ({ 
   show, 

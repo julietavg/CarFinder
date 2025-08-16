@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './App.css';
 import Login from './components/Login/Login';
-import VehicleList from './components/VehicleList';
+import VehicleList from './components/vehicle-list/VehicleList';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { PageTransitionProvider } from './contexts/PageTransitionContext';
 

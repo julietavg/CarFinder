@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import '../styles/components/VehicleList.css';
+import "../../styles/components/VehicleList.css";
 import Particles from './Particles';
-import VehicleDetails from './VehicleDetails';
-import VehicleForm from './VehicleForm';
-import Navigation from './Navigation';
-import FilterPanel from './FilterPanel';
-import ConfirmationModal from './ConfirmationModal';
+import VehicleDetails from '../vehicle/VehicleDetails';
+import VehicleForm from '../vehicle/VehicleForm';
+import Navigation from "../Navigation/Navigation";
+import FilterPanel from '../vehicle/FilterPanel';
+import ConfirmationModal from '../vehicle/ConfirmationModal';
 
 const VehicleList = ({ onLogout }) => {
   const [vehicles, setVehicles] = useState([]);

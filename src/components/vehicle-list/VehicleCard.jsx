@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
-import formatPrice from '../utils/formatPrice';
+import formatPrice from '../../utils/formatPrice';
 
 const VehicleCard = memo(function VehicleCard({ vehicle, index, onView, onEdit, onDelete, onImageError }) {
   return (

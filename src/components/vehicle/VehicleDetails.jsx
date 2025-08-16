@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/components/VehicleDetails.css';
+import '../../styles/components/VehicleDetails.css';
 
 const VehicleDetails = ({ vehicle, onClose }) => {
   const [showDetails, setShowDetails] = useState(false);
