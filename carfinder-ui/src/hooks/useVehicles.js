@@ -1,12 +1,40 @@
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 
-
 // Custom hook for vehicle data management
 export const useVehicles = () => {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Map frontend vehicle object to backend DTO keys
+  const mapVehicleToApi = (vehicle) => ({
+    vin: vehicle.vin || '',
+    make: vehicle.make || '',
+    model: vehicle.model || '',
+    subModel: vehicle.subModel || vehicle.submodel || '',
+    year: parseInt(vehicle.year) || 0,
+    price: parseFloat(vehicle.price) || 0.0,
+    mileage: parseInt(vehicle.mileage) || 0,
+    color: vehicle.color || '',
+    transmission: vehicle.transmission || '',
+    image: vehicle.image || ''
+  });
+
+  // Map API response to frontend format
+  const mapApiToVehicle = (apiVehicle) => ({
+    id: apiVehicle.id,
+    vin: apiVehicle.vin,
+    make: apiVehicle.make,
+    model: apiVehicle.model,
+    submodel: apiVehicle.subModel, // Map subModel to submodel
+    year: apiVehicle.year,
+    price: apiVehicle.price,
+    mileage: apiVehicle.mileage,
+    color: apiVehicle.color,
+    transmission: apiVehicle.transmission,
+    image: apiVehicle.image
+  });
 
   const fetchVehicles = async () => {
     try {
@@ -18,12 +46,14 @@ export const useVehicles = () => {
         },
         withCredentials: true
       });
-      setVehicles(response.data);
+      // Map each vehicle from API format to frontend format
+      const mappedVehicles = response.data.map(mapApiToVehicle);
+      setVehicles(mappedVehicles);
       setLoading(false);
     } catch (err) {
       setError('Could not load the list. Please try again.');
       setLoading(false);
-      console.error('Vehicle fetch error:', err); // <-- Add this line
+      console.error('Vehicle fetch error:', err);
     }
   };
 
@@ -34,14 +64,13 @@ export const useVehicles = () => {
 
   const addVehicle = async (vehicleData) => {
     try {
-      const response = await axios.post('http://carfinder.local/api/cars', vehicleData, {
+      const response = await axios.post('http://carfinder.local/api/cars', mapVehicleToApi(vehicleData), {
         auth: {
           username: 'admin',
           password: 'admin123'
         },
         withCredentials: true
       });
-      // Optionally, fetch the updated list or add the new car to state
       fetchVehicles();
       return response.data;
     } catch (err) {
@@ -52,7 +81,7 @@ export const useVehicles = () => {
 
   const updateVehicle = async (vehicleData) => {
     try {
-      const response = await axios.put(`http://carfinder.local/api/cars/${vehicleData.id}`, vehicleData, {
+      const response = await axios.put(`http://carfinder.local/api/cars/${vehicleData.id}`, mapVehicleToApi(vehicleData), {
         auth: {
           username: 'admin',
           password: 'admin123'

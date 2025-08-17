@@ -52,17 +52,13 @@ const VehicleList = ({ onLogout }) => {
   // Opening add form now only via navbar's onAddVehicle prop
   const openAddForm = () => setShowAddForm(true);
   
-  const handleSaveVehicle = (vehicleData) => {
+
+  const handleSaveVehicle = async (vehicleData) => {
     if (vehicleData.id && vehicles.some(v => v.id === vehicleData.id)) {
-      // Editing existing vehicle
-      setVehicles(prevVehicles => 
-        prevVehicles.map(v => v.id === vehicleData.id ? vehicleData : v)
-      );
+      await updateVehicle(vehicleData);
     } else {
-      // Adding new vehicle
-      setVehicles(prevVehicles => [vehicleData, ...prevVehicles]);
+      await addVehicle(vehicleData);
     }
-    
     setEditingVehicle(null);
     setShowAddForm(false);
   };
@@ -198,10 +194,12 @@ const VehicleList = ({ onLogout }) => {
     }
   };
 
-  const confirmDelete = () => {
+
+  const confirmDelete = async () => {
     if (vehicleToDelete) {
-      setVehicles(vehicles.filter(vehicle => vehicle.id !== vehicleToDelete.id));
+      await deleteVehicle(vehicleToDelete.id);
       setVehicleToDelete(null);
+      setShowDeleteConfirmation(false);
     }
   };
 
