@@ -23,3 +23,16 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Node.js/Frontend
+node_modules/
+carfinder-ui/node_modules/
+carfinder-ui/dist/
+carfinder-ui/.env*
+carfinder-ui/package-lock.json
+
+# General
+dist/
+.env*
+package-lock.json
+package.json

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useVehicles } from '../../hooks/useVehicles';
 import PropTypes from 'prop-types';
 import "../../styles/components/VehicleList.css";
 import Particles from './Particles';
@@ -9,9 +10,14 @@ import FilterPanel from '../vehicle/FilterPanel';
 import ConfirmationModal from '../vehicle/ConfirmationModal';
 
 const VehicleList = ({ onLogout }) => {
-  const [vehicles, setVehicles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {
+    vehicles,
+    loading,
+    error,
+    addVehicle,
+    updateVehicle,
+    deleteVehicle
+  } = useVehicles();
   const [imageErrors, setImageErrors] = useState({});
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false); /* triggered only from navbar now */
@@ -61,132 +67,7 @@ const VehicleList = ({ onLogout }) => {
     setShowAddForm(false);
   };
 
-  useEffect(() => {
-    // Simulamos la carga de datos
-    const fetchVehicles = async () => {
-      try {
-        setLoading(true);
-        // Simular llamada a la API
-        setTimeout(() => {
-          // Datos de ejemplo con rangos de precios más diversos
-          const mockVehicles = [
-            {
-              id: 1,
-              make: 'FORD',
-              model: 'MUSTANG',
-              year: 2019,
-              submodel: 'CLASSIC',
-              price: 150000,
-              vin: '1FA6P8TH5K5123456',
-              transmission: 'Manual',
-              mileage: 25000,
-              color: 'Red',
-              image: 'https://images.unsplash.com/photo-1581650107963-3e8c1f48241b?q=80&w=1000&auto=format&fit=crop'
-            },
-            {
-              id: 2,
-              make: 'CHEVROLET',
-              model: 'CAMARO',
-              year: 2020,
-              submodel: 'SS',
-              price: 130000,
-              vin: '1G1FB1RX7L0234567',
-              transmission: 'Automatic',
-              mileage: 18000,
-              color: 'Black',
-              image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=1000&auto=format&fit=crop'
-            },
-            {
-              id: 3,
-              make: 'DODGE',
-              model: 'CHALLENGER',
-              year: 2021,
-              submodel: 'SRT',
-              price: 175000,
-              vin: '2C3CDZC91MH345678',
-              transmission: 'Automatic',
-              mileage: 12000,
-              color: 'Orange',
-              image: 'https://images.unsplash.com/photo-1588127333419-b9d7de223dcf?q=80&w=1000&auto=format&fit=crop'
-            },
-            {
-              id: 4,
-              make: 'PORSCHE',
-              model: '911',
-              year: 2022,
-              submodel: 'CARRERA',
-              price: 220000,
-              vin: 'WP0CA2A94NS456789',
-              transmission: 'Manual',
-              mileage: 8500,
-              color: 'White',
-              image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1000&auto=format&fit=crop'
-            },
-            {
-              id: 5,
-              make: 'TOYOTA',
-              model: 'COROLLA',
-              year: 2023,
-              submodel: 'LE',
-              price: 45000,
-              vin: 'JTDEBU5E3P3567890',
-              transmission: 'CVT',
-              mileage: 5000,
-              color: 'Silver',
-              image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=1000&auto=format&fit=crop'
-            },
-            {
-              id: 6,
-              make: 'BMW',
-              model: 'M3',
-              year: 2022,
-              submodel: 'COMPETITION',
-              price: 180000,
-              vin: 'WBS8M9C59N5678901',
-              transmission: 'Automatic',
-              mileage: 15000,
-              color: 'Blue',
-              image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=1000&auto=format&fit=crop'
-            },
-            {
-              id: 7,
-              make: 'MERCEDES',
-              model: 'C-CLASS',
-              year: 2021,
-              submodel: 'AMG',
-              price: 195000,
-              vin: 'W1KZF8DB9MA789012',
-              transmission: 'Automatic',
-              mileage: 22000,
-              color: 'Gray',
-              image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=1000&auto=format&fit=crop'
-            },
-            {
-              id: 8,
-              make: 'AUDI',
-              model: 'A4',
-              year: 2020,
-              submodel: 'PREMIUM',
-              price: 85000,
-              vin: 'WAUDNAF46LA890123',
-              transmission: 'Automatic',
-              mileage: 32000,
-              color: 'Black',
-              image: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?q=80&w=1000&auto=format&fit=crop'
-            }
-          ];
-          setVehicles(mockVehicles);
-          setFilteredVehicles(mockVehicles);
-          setLoading(false);
-        }, 1500);
-      } catch (err) {
-        setError('Could not load the list. Please try again.');
-        setLoading(false);
-      }
-    };
-
-    fetchVehicles();
-  }, []);
+  // Vehicles are now fetched via useVehicles hook
 
   // Inicializar búsqueda desde sessionStorage al montar
   useEffect(() => {

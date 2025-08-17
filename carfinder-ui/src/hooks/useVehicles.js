@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
+import axios from 'axios';
+
 
 // Custom hook for vehicle data management
 export const useVehicles = () => {
@@ -9,16 +11,19 @@ export const useVehicles = () => {
   const fetchVehicles = async () => {
     try {
       setLoading(true);
-      // Simulate API call
-      const { mockVehicles } = await import('../data/mockVehicles');
-      
-      setTimeout(() => {
-        setVehicles(mockVehicles);
-        setLoading(false);
-      }, 1500);
+      const response = await axios.get('http://carfinder.local/api/cars', {
+        auth: {
+          username: 'admin',
+          password: 'admin123'
+        },
+        withCredentials: true
+      });
+      setVehicles(response.data);
+      setLoading(false);
     } catch (err) {
       setError('Could not load the list. Please try again.');
       setLoading(false);
+      console.error('Vehicle fetch error:', err); // <-- Add this line
     }
   };
 
