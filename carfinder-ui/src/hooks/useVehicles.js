@@ -31,18 +31,56 @@ export const useVehicles = () => {
     fetchVehicles();
   }, []);
 
-  const addVehicle = (vehicleData) => {
-    setVehicles(prev => [vehicleData, ...prev]);
+
+  const addVehicle = async (vehicleData) => {
+    try {
+      const response = await axios.post('http://carfinder.local/api/cars', vehicleData, {
+        auth: {
+          username: 'admin',
+          password: 'admin123'
+        },
+        withCredentials: true
+      });
+      // Optionally, fetch the updated list or add the new car to state
+      fetchVehicles();
+      return response.data;
+    } catch (err) {
+      setError('Could not add vehicle.');
+      console.error('Add vehicle error:', err);
+    }
   };
 
-  const updateVehicle = (vehicleData) => {
-    setVehicles(prev => 
-      prev.map(v => v.id === vehicleData.id ? vehicleData : v)
-    );
+  const updateVehicle = async (vehicleData) => {
+    try {
+      const response = await axios.put(`http://carfinder.local/api/cars/${vehicleData.id}`, vehicleData, {
+        auth: {
+          username: 'admin',
+          password: 'admin123'
+        },
+        withCredentials: true
+      });
+      fetchVehicles();
+      return response.data;
+    } catch (err) {
+      setError('Could not update vehicle.');
+      console.error('Update vehicle error:', err);
+    }
   };
 
-  const deleteVehicle = (vehicleId) => {
-    setVehicles(prev => prev.filter(v => v.id !== vehicleId));
+  const deleteVehicle = async (vehicleId) => {
+    try {
+      await axios.delete(`http://carfinder.local/api/cars/${vehicleId}`, {
+        auth: {
+          username: 'admin',
+          password: 'admin123'
+        },
+        withCredentials: true
+      });
+      fetchVehicles();
+    } catch (err) {
+      setError('Could not delete vehicle.');
+      console.error('Delete vehicle error:', err);
+    }
   };
 
   return {
