@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: carfinder-app
+  labels:
+    app: carfinder-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: carfinder-app
+  template:
+    metadata:
+      labels:
+        app: carfinder-app
+    spec:
+      containers:
+        - name: carfinder-frontend
+          image: 192.168.1.72:8085/carfinder-ui:latest
+          ports:
+            - containerPort: 80
+        - name: carfinder-backend
+          image: 192.168.1.72:8085/carfinder-api:latest
+          ports:
+            - containerPort: 8081
+          env:
+            - name: DB_HOST
+              value: "mysql-service"
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              value: "carfinder"
+            - name: DB_USER
+              value: "carfinder_user"
+            - name: DB_PASSWORD
+              value: "carfinder_pass"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "rootpassword"
+            - name: MYSQL_DATABASE
+              value: "carfinder"
+            - name: MYSQL_USER
+              value: "carfinder_user"
+            - name: MYSQL_PASSWORD
+              value: "carfinder_pass"
+              # Add this to make table names case-insensitive
+            - name: MYSQL_LOWER_CASE_TABLE_NAMES
+              value: "1"

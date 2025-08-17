@@ -1,70 +1,172 @@
-# Getting Started with Create React App
+# CarFinder Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack car finder application with Spring Boot backend and React frontend, deployed on Kubernetes using Rancher Desktop.
 
-## Available Scripts
+## Prerequisites
 
-In the project directory, you can run:
+Before running the application, ensure you have the following installed:
 
-### `npm start`
+- **Rancher Desktop** - for Kubernetes cluster management
+- **Docker** - for building container images
+- **PowerShell** - for running deployment scripts
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Setup Instructions
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 1. Install Rancher Desktop
 
-### `npm test`
+Download and install [Rancher Desktop](https://rancherdesktop.io/) to provide a local Kubernetes cluster.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 2. Configure Host File
 
-### `npm run build`
+Add the following entry to your hosts file to enable local domain access:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+**Windows**: Edit `C:\Windows\System32\drivers\etc\hosts`
+```
+127.0.0.1 carfinder.local
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+**Mac/Linux**: Edit `/etc/hosts`
+```
+127.0.0.1 carfinder.local
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 3. Configure Docker Registry IP
 
-### `npm run eject`
+Update the Docker registry IP address in the following files to match your local registry:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+#### Update `deploy/deployment.yaml`:
+```yaml
+# Change these image references:
+image: 192.168.1.72:8085/carfinder-ui:latest
+image: 192.168.1.72:8085/carfinder-api:latest
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+# To your registry IP:
+image: YOUR_REGISTRY_IP:8085/carfinder-ui:latest
+image: YOUR_REGISTRY_IP:8085/carfinder-api:latest
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+#### Update `docker-compose.yml`:
+```yaml
+# Change these image references:
+image: 192.168.1.72:8085/carfinder-ui:latest
+image: 192.168.1.72:8085/carfinder-api:latest
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+# To your registry IP:
+image: YOUR_REGISTRY_IP:8085/carfinder-ui:latest
+image: YOUR_REGISTRY_IP:8085/carfinder-api:latest
+```
 
-## Learn More
+### 4. Configure Docker Daemon for Insecure Registry
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Add your registry IP to Docker's insecure registries list:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+#### Rancher Desktop:
+1. Open Rancher Desktop
+2. Go to Settings/Preferences
+3. Navigate to Docker Engine settings
+4. Add your registry to the insecure registries:
+```json
+{
+  "insecure-registries": ["YOUR_REGISTRY_IP:8085"]
+}
+```
 
-### Code Splitting
+#### Docker Desktop (if using instead):
+1. Open Docker Desktop
+2. Go to Settings → Docker Engine
+3. Add to the configuration:
+```json
+{
+  "insecure-registries": ["YOUR_REGISTRY_IP:8085"]
+}
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Deployment
 
-### Analyzing the Bundle Size
+### Automated Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+The entire application can be deployed using the provided PowerShell script:
 
-### Making a Progressive Web App
+```powershell
+.\deploy.ps1
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+This script performs three main steps:
 
-### Advanced Configuration
+1. **Build Images**: Builds Docker images for both frontend and backend
+2. **Push Images**: Pushes the built images to your configured registry
+3. **Deploy to Kubernetes**: Applies all Kubernetes manifests to deploy the application
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Manual Deployment Steps
 
-### Deployment
+If you prefer to run the steps manually:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```powershell
+# 1. Build and push images
+docker-compose build
+docker-compose push
 
-### `npm run build` fails to minify
+# 2. Deploy to Kubernetes
+kubectl apply -f deploy/
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Accessing the Application
+
+Once deployed, you can access the application at:
+
+- **Frontend**: [http://carfinder.local](http://carfinder.local)
+- **API**: [http://carfinder.local/api/cars](http://carfinder.local/api/cars)
+- **Swagger UI**: [http://carfinder.local/swagger-ui/index.html](http://carfinder.local/swagger-ui/index.html)
+- **API Documentation**: [http://carfinder.local/v3/api-docs](http://carfinder.local/v3/api-docs)
+
+### Direct NodePort Access (for testing)
+
+If domain access doesn't work, you can access services directly via NodePort:
+
+- **Frontend**: [http://localhost:30080](http://localhost:30080)
+- **Backend**: [http://localhost:30881](http://localhost:30881)
+- **MySQL**: [http://localhost:30336](http://localhost:30336)
+- **Swagger UI**: [http://localhost:30881/swagger-ui/index.html](http://localhost:30881/swagger-ui/index.html)
+
+## Architecture
+
+The application consists of:
+
+- **Frontend**: React application served via Nginx
+- **Backend**: Spring Boot REST API with MySQL database
+- **Database**: MySQL 8.0 with persistent storage
+- **Ingress**: Traefik ingress controller for routing
+
+## Troubleshooting
+
+### Common Issues:
+
+1. **404 errors**: Ensure the hosts file is configured correctly
+2. **Image pull errors**: Verify the insecure registry configuration
+3. **Database connection issues**: Check that the MySQL pod is running
+4. **Port conflicts**: Ensure ports 30080, 30881, and 30336 are available
+
+### Checking Deployment Status:
+
+```powershell
+# Check all pods
+kubectl get pods
+
+# Check services
+kubectl get services
+
+# Check ingress
+kubectl get ingress
+
+# View pod logs
+kubectl logs <pod-name>
+```
+
+## Development
+
+For local development without Kubernetes:
+
+1. Start MySQL locally or use Docker
+2. Update `application.properties` with local database settings
+3. Run the Spring Boot application
+4. Run the React development server
