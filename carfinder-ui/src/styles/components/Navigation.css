@@ -22,7 +22,7 @@
 
 .nav-container {
   display: grid;
-  grid-template-columns: auto 1fr auto; /* logo | center area | right side */
+  grid-template-columns: auto 1fr auto; /* logo | links | right side (desktop) */
   align-items: center;
   width: 100%;
   max-width: 1400px;
@@ -39,6 +39,12 @@
   margin-left: 0; /* remove left offset so it can center precisely */
   justify-self: center; /* center within middle grid column */
 }
+
+/* Estado móvil: inicialmente oculto */
+.nav-links.open { display:flex; }
+
+/* Botón hamburguesa oculto en escritorio */
+.hamburger-btn { display:none; }
 
 .nav-link {
   background: none;
@@ -161,4 +167,129 @@
   .nav-link { font-size:.8rem; }
   .search-input { width:170px; }
 }
+
+/* ===== Mobile Menu (<=780px) ===== */
+@media (max-width: 780px) {
+  html, body { overflow-x:hidden; }
+  .main-nav { height:70px; }
+  .main-nav.scrolled { height:60px; }
+  .nav-container { grid-template-columns: auto 1fr auto; padding:0 .75rem 0 .65rem; }
+  .logo-container { order:0; margin-left:0; }
+  /* Panel anclado a la derecha bajo el nav */
+  .nav-links {
+    position: fixed;
+    top:70px; /* igual a altura normal */
+    right:.75rem;
+    left:auto;
+    width:min(390px,92vw);
+    flex-direction:column;
+    background:linear-gradient(135deg,rgba(24,26,32,0.95),rgba(24,26,32,0.9));
+    backdrop-filter:blur(18px) saturate(1.35);
+    padding:1.1rem 1.3rem 1.8rem;
+    gap:1rem;
+    box-shadow:0 14px 42px -18px rgba(0,0,0,.7), 0 6px 20px -8px rgba(0,0,0,.55);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:26px;
+    transform:translateY(-14px) scale(.96);
+    opacity:0;
+    pointer-events:none;
+    transition: opacity .35s cubic-bezier(.22,.8,.3,1), transform .35s cubic-bezier(.22,.8,.3,1);
+    max-height:calc(100dvh - 90px);
+    overflow-y:auto;
+    overflow-x:hidden;
+    z-index:120;
+    scrollbar-width:none;
+  }
+  .main-nav.scrolled .nav-links { top:60px; max-height:calc(100dvh - 80px); }
+  .nav-links::-webkit-scrollbar { width:0; height:0; }
+  .nav-links.open { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+  .nav-link { width:100%; text-align:left; font-size:.9rem; padding:.55rem .2rem; }
+  .nav-link::after { bottom:-4px; }
+  .nav-right { order:2; justify-self:end; margin-left:0; }
+  .search-icon { margin-left:.5rem; }
+  .user-profile { margin-left:.4rem; }
+  /* Ocultar búsqueda y perfil de la barra principal en móvil (usamos versión dentro del panel) */
+  .nav-right .search-bar, .nav-right .search-icon, .nav-right > .user-profile:not(.mobile) { display:none !important; }
+
+  /* Contenido extra móvil dentro del panel */
+  .mobile-extra { width:100%; display:flex; flex-direction:column; gap:1.1rem; margin-bottom:.6rem; }
+  .mobile-search-row { display:flex; align-items:stretch; gap:.5rem; }
+  .mobile-search-input { flex:1; border:none; background:rgba(255,255,255,0.09); color:#fff; padding:.7rem .9rem; border-radius:14px; font:500 .85rem/1 var(--font-primary,'Poppins',sans-serif); letter-spacing:.3px; box-shadow:inset 0 0 0 1px rgba(255,255,255,0.06); }
+  .mobile-search-input:focus { outline:2px solid rgba(255,255,255,.28); outline-offset:2px; }
+  .mobile-search-input::placeholder { color:rgba(255,255,255,.45); }
+  .mobile-search-btn { width:48px; border:none; border-radius:14px; background:linear-gradient(140deg,var(--accent-primary,#6366f1),var(--accent-tertiary,#8b5cf6)); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 18px -6px rgba(0,0,0,.7); transition:.3s; }
+  .mobile-search-btn:hover { filter:brightness(1.08); }
+  .mobile-extra .user-profile.mobile { position:static; }
+  .mobile-extra .user-profile .user-dropdown { position:static; margin-top:.4rem; box-shadow:none; width:100%; border-radius:14px; }
+  /* Bloques dentro del panel */
+  .glass-block { background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.015)); border:1px solid rgba(255,255,255,0.10); padding:1rem 1rem 1.05rem; border-radius:22px; position:relative; box-shadow:0 2px 10px -4px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,0.04) inset; backdrop-filter:blur(14px) saturate(1.35); }
+  .mobile-menu-inner { display:flex; flex-direction:column; width:100%; gap:1.1rem; }
+  .menu-items { display:flex; flex-direction:column; gap:.4rem; }
+  .menu-scroll { display:flex; flex-direction:column; gap:.2rem; }
+  .collapsible-wrapper { width:100%; }
+  .collapsible-wrapper .menu-item-panel-wrapper { height:0; max-height:0; overflow:hidden; transition: height .35s cubic-bezier(.22,.8,.3,1), max-height .35s cubic-bezier(.22,.8,.3,1); }
+  .collapsible-wrapper.open .menu-item-panel-wrapper { height:auto; max-height:180px; }
+  .menu-item { display:flex; align-items:center; gap:.75rem; padding:.9rem .9rem; font-size:.85rem; font-weight:500; letter-spacing:.4px; border-radius:16px; position:relative; background:transparent; transition:.3s; }
+  .menu-item.collapsible { justify-content:space-between; }
+  .menu-item.collapsible .caret { width:10px; height:10px; border-right:2px solid rgba(255,255,255,.65); border-bottom:2px solid rgba(255,255,255,.65); transform:rotate(45deg); transition:.3s; margin-left:auto; opacity:.7; }
+  .menu-item.collapsible.open .caret { transform:rotate(225deg); opacity:1; }
+  .menu-item .nav-item-icon { opacity:.7; transition:.3s; }
+  .menu-item.active { background:rgba(255,255,255,0.12); }
+  .menu-item:hover { background:rgba(255,255,255,0.1); color:#fff; }
+  .menu-item:hover .nav-item-icon, .menu-item.active .nav-item-icon { opacity:1; }
+  /* Quitar resaltado especial en móvil para Add new vehicle */
+  .menu-item.add-link { background:transparent; color:rgba(255,255,255,0.85); font-weight:500; box-shadow:none; }
+  .menu-item.add-link .nav-item-icon { opacity:.7; }
+  .menu-item.add-link:hover { background:rgba(255,255,255,0.1); color:#fff; }
+  .menu-item:not(:last-child)::after { content:''; position:absolute; left:50px; right:12px; bottom:0; height:1px; background:linear-gradient(90deg,rgba(255,255,255,0.18),rgba(255,255,255,0)); opacity:.32; }
+  .menu-item.add-link::after { display:none; }
+  .menu-item-panel { padding:.65rem .2rem .9rem 2.6rem; display:flex; flex-direction:column; gap:.7rem; animation:panelIn .35s cubic-bezier(.22,.8,.3,1); }
+  @keyframes panelIn { from { opacity:0; transform:translateY(-4px);} to { opacity:1; transform:translateY(0);} }
+  .panel-row { display:flex; align-items:stretch; gap:.55rem; }
+  .panel-input { flex:1; border:none; background:rgba(255,255,255,0.08); color:#fff; padding:.65rem .85rem; border-radius:14px; font:500 .75rem/1 var(--font-primary,'Poppins',sans-serif); letter-spacing:.3px; box-shadow:inset 0 0 0 1px rgba(255,255,255,0.07); }
+  .panel-input:focus { outline:2px solid rgba(255,255,255,.28); outline-offset:2px; }
+  .panel-input::placeholder { color:rgba(255,255,255,.45); }
+  .panel-action { width:46px; height:46px; display:flex; align-items:center; justify-content:center; background:linear-gradient(140deg,var(--accent-primary,#6366f1),var(--accent-tertiary,#8b5cf6)); color:#fff; border:none; border-radius:14px; cursor:pointer; box-shadow:0 4px 18px -6px rgba(0,0,0,.7); transition:.3s; }
+  .panel-action:hover { filter:brightness(1.08); }
+  .panel-action.wide { width:100%; height:auto; padding:.85rem 1rem; gap:.55rem; font:600 .72rem/1 var(--font-primary,'Poppins',sans-serif); display:flex; justify-content:center; }
+
+  /* Botón hamburguesa */
+  .hamburger-btn { display:flex; flex-direction:column; justify-content:center; gap:5px; width:44px; height:44px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.15); border-radius:14px; cursor:pointer; margin-left:.6rem; transition:.3s; position:relative; order:3; }
+  .hamburger-btn:hover { background:rgba(255,255,255,0.14); }
+  .hamburger-btn .bar { width:20px; height:2px; background:#fff; border-radius:2px; transition:.4s; margin:0 auto; }
+  .hamburger-btn.active .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger-btn.active .bar:nth-child(2) { opacity:0; }
+  .hamburger-btn.active .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Overlay detrás del menú */
+  .nav-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); backdrop-filter: blur(2px); animation: fadeIn .3s ease forwards; }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+  /* Ajustar posición vertical de menú cuando el nav se contrae */
+  /* Ajuste vertical cuando se reduce la altura del nav: simplemente menor padding-top arriba */
+  /* Eliminado selector vacío: el padding-top se ajusta mediante regla anterior */
+  body.no-scroll { overflow:hidden; } /* prevent background scroll when mobile menu open */
+}
+
+  /* ===== Overrides escritorio para que las estructuras móviles no rompan el layout >780px ===== */
+  @media (min-width: 781px) {
+    /* Restablecer navegación horizontal limpia */
+    .nav-links { position:static; width:auto; background:transparent; box-shadow:none; border:none; flex-direction:row; padding:0; gap:2.2rem; transform:none; opacity:1; pointer-events:auto; max-height:none; overflow:visible; }
+    .nav-links.open { transform:none; opacity:1; }
+    /* Aplanar wrappers del menú móvil */
+    .nav-links .mobile-menu-inner,
+    .nav-links .menu-scroll,
+    .nav-links .glass-block { display:flex; background:transparent; padding:0; margin:0; box-shadow:none; border:none; flex-direction:row; gap:2.2rem; width:auto; }
+    /* Ocultar colapsables (Search & Account versión móvil) */
+    .nav-links .collapsible-wrapper, .nav-links .menu-item.collapsible, .nav-links .menu-item-panel-wrapper { display:none !important; }
+    /* Estilizar items como enlaces normales */
+    .nav-links .menu-item { background:transparent; padding:.4rem .2rem; border-radius:0; font:500 0.95rem/1 var(--font-primary,'Poppins',sans-serif); letter-spacing:.4px; gap:.55rem; position:relative; box-shadow:none; display:inline-flex; align-items:center; line-height:1; }
+    .nav-links .menu-item svg.nav-item-icon, .nav-links .menu-item .nav-item-icon { width:18px; height:18px; display:block; opacity:.8; transition:.25s; }
+    .nav-links .menu-item:hover .nav-item-icon, .nav-links .menu-item.active .nav-item-icon { opacity:1; }
+    .nav-links .menu-item.add-link { background:transparent; padding:.4rem .2rem; border-radius:0; font-weight:500; box-shadow:none; gap:.55rem; }
+    .nav-links .menu-item.add-link .nav-item-icon { opacity:.8; }
+    .nav-links .menu-item.add-link:hover .nav-item-icon { opacity:1; }
+    .nav-links .menu-item:not(:last-child)::after { display:none; }
+    /* Quitar estilos de panel específicos móvil */
+    .nav-links .menu-item-panel, .nav-links .panel-row, .nav-links .panel-input, .nav-links .panel-action { display:none; }
+  }
 
