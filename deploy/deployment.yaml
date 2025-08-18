@@ -16,11 +16,11 @@ spec:
     spec:
       containers:
         - name: carfinder-frontend
-          image: 10.83.66.54:8085/carfinder-ui:latest
+          image: 10.83.64.110:8085/carfinder-ui:latest
           ports:
             - containerPort: 80
         - name: carfinder-backend
-          image: 10.83.66.54:8085/carfinder-api:latest
+          image: 10.83.64.110:8085/carfinder-api:latest
           ports:
             - containerPort: 8081
           env:
@@ -68,3 +68,10 @@ spec:
               # Add this to make table names case-insensitive
             - name: MYSQL_LOWER_CASE_TABLE_NAMES
               value: "1"
+          volumeMounts:
+            - name: db-init
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: db-init
+          configMap:
+            name: carfinder-db-init

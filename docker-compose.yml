@@ -5,7 +5,7 @@ services:
     build:
       context: ./carfinder-ui
       dockerfile: dockerfile
-    image:  10.83.66.54:8085/carfinder-ui:latest
+    image:  10.83.64.110:8085/carfinder-ui:latest
     container_name: carfinder_frontend
     # Remove ports and depends_on since we're just building/pushing
     networks:
@@ -15,7 +15,7 @@ services:
     build:
       context: ./carfinder
       dockerfile: dockerfile
-    image:  10.83.66.54:8085/carfinder-api:latest
+    image:  10.83.64.110:8085/carfinder-api:latest
     container_name: carfinder_backend
     # Remove ports and environment since we're just building/pushing
     networks:
