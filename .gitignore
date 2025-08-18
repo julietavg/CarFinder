@@ -1,25 +1,32 @@
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
 .vscode/
+
+# Logs
+*.log
+logs/
+
+# --- Backend (Spring Boot / Maven) ---
+carfinder/target/
+carfinder/.env
+carfinder/*.db
+carfinder/*.mv.db
+carfinder/*.h2.db
+
+# Keep real app props out of Git (commit a template instead)
+carfinder/src/main/resources/application.properties
+carfinder/src/main/resources/application.yml
+carfinder/src/main/resources/application.yaml
+
+# --- Frontend (Vite/React) ---
+carfinder-ui/node_modules/
+carfinder-ui/dist/
+carfinder-ui/.env
+carfinder-ui/.env.*
+!carfinder-ui/.env.example
+
+# Package managers (lockfiles should be committed!)
+# (so don't ignore: package-lock.json, yarn.lock, pnpm-lock.yaml)

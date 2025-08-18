@@ -1,246 +1,401 @@
-\# 🚗 CarFinder API
+CarFinder – Full-Stack Guide (Backend + Frontend)
+
+Spring Boot (Java 17) + MySQL + React (Vite).
+Roles: ADMIN (admin/admin123) & USER (user/user123).
+UI shows Add/Edit/Delete only to ADMIN.
+
+Repository Layout
+CarFinder/
+├─ backend/                        # Spring Boot app (pom.xml here)
+│  ├─ src/main/java/com/carfinder/sales/...
+│  │   ├─ CarFinderApplication.java
+│  │   ├─ controllers/CarController.java
+│  │   ├─ config/SecurityConfig.java
+│  │   ├─ config/CorsConfig.java                 (optional global CORS)
+│  │   ├─ services/CarService.java
+│  │   ├─ repositories/CarRepository.java
+│  │   ├─ entities/Car.java
+│  │   ├─ dtos/CarDTO.java
+│  │   ├─ mapper/CarMapper.java
+│  │   ├─ api/AuthController.java                (GET /api/auth/me)
+│  │   └─ api/ApiExceptionHandler.java           (@RestControllerAdvice)
+│  └─ src/main/resources/application.properties
+│
+└─ carfinder-ui/                   # React + Vite app
+   ├─ .env                         # VITE_API_BASE, etc.
+   ├─ vite.config.ts (or .js)      # dev server proxy/port
+   ├─ src/
+   │  ├─ App.jsx                   # axios baseURL & auth; session (role)
+   │  ├─ components/
+   │  │  ├─ Login/Login.jsx
+   │  │  ├─ Navigation/Navigation.jsx
+   │  │  ├─ vehicle-list/VehicleList.jsx
+   │  │  ├─ vehicle/VehicleForm.jsx
+   │  │  ├─ vehicle/VehicleDetails.jsx
+   │  │  ├─ vehicle/FilterPanel.jsx
+   │  │  ├─ vehicle/ConfirmationModal.jsx
+   │  │  └─ feedback/SuccessModal.jsx
+   │  └─ styles/...
+   └─ public/
 
+1) Backend
+1.1 Prereqs
 
+Java 17+
 
-CarFinder is a full-stack web application designed to manage and explore a car inventory system. It provides RESTful endpoints for creating, updating, deleting, and retrieving car data, with role-based access control for administrators and regular users.
+Maven 3.9+ (or ./mvnw)
 
+MySQL 8+
 
+1.2 Database
 
----
+Create DB (adjust user/pass as needed):
 
+CREATE DATABASE vehicle_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- Optionally create a user:
+-- CREATE USER 'carfinder'@'%' IDENTIFIED BY 'strongpass';
+-- GRANT ALL PRIVILEGES ON vehicle_db.* TO 'carfinder'@'%';
+-- FLUSH PRIVILEGES;
 
+1.3 backend/src/main/resources/application.properties
+spring.datasource.url=jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:vehiclesdb}
+spring.datasource.username=${DB_USER:root}
+spring.datasource.password=${DB_PASSWORD:your_password}
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
-\## 📌 Purpose
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+# Let Hibernate pick MySQL dialect automatically:
+# spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
 
+1.4 Security (HTTP Basic + roles)
 
+@EnableMethodSecurity(prePostEnabled = true) on your security config.
 
-This project demonstrates:
+Users:
 
-\- Robust backend architecture using \*\*Spring Boot\*\*
+admin/admin123 → ROLE_ADMIN
 
-\- DTO-based data transfer and validation
+user/user123 → ROLE_USER
 
-\- Role-based security with \*\*Spring Security\*\*
+Rules:
 
-\- API documentation via \*\*Swagger/OpenAPI\*\*
+GET /api/cars/** → ADMIN or USER
 
-\- Reproducible testing via \*\*Postman Collection\*\*
+POST/PUT/DELETE /api/cars/** → ADMIN only
 
-\- Integration-ready endpoints for frontend consumption
+Auth endpoint: GET /api/auth/me returns { username, roles: [...] }.
 
+1.5 CORS
 
+Allow Vite dev origin. Option A: on controller:
 
----
+@CrossOrigin(
+  origins = "http://localhost:5173",
+  allowedHeaders = {"Authorization","Content-Type","Accept"},
+  methods = {RequestMethod.GET,RequestMethod.POST,RequestMethod.PUT,RequestMethod.DELETE,RequestMethod.OPTIONS},
+  allowCredentials = "true"
+)
+@RestController
+@RequestMapping("/api/cars")
+public class CarController { ... }
 
 
+If you change the Vite port, update the origin accordingly.
 
-\## 🧱 Project Structure
+1.6 Validation & Errors
 
+Implemented in CarService + ApiExceptionHandler:
 
+Required (no blanks): vin, make, model, subModel, transmission, color, image
 
+VIN: uppercase, no I/O/Q, unique
 
+Year ∈ [1930, 2026]
 
----
+Price ∈ [5000.00, 350000.00]
 
+Mileage > 0
 
+Error payloads
 
-\## 🔐 Roles
+400:
 
+{ "message": "Validation failed.", "errors": { "year":"Year cannot be empty." } }
 
 
-| Role   | Access Level |
+409:
 
-|--------|--------------|
+{ "message":"Cannot add car with same VIN." }
 
-| Admin  | Full CRUD    |
 
-| User   | Read-only    |
+404 / 500 analogous.
 
+1.7 Run backend
+cd CarFinder/backend
+./mvnw spring-boot:run   # or: mvnw.cmd spring-boot:run (Windows)
 
 
----
+Server: http://localhost:8080
 
+Smoke test:
 
+# Linux/macOS:
+curl -i -u admin:admin123 http://localhost:8080/api/cars
 
-\## 🚀 Endpoints
+# Windows PowerShell (use curl.exe):
+curl.exe -i -u admin:admin123 http://localhost:8080/api/cars
 
+2) Frontend
+2.1 Prereqs
 
+Node 18+ (20+ recommended)
 
-\### 🔍 Public (User \& Admin)
+npm 9+ (or pnpm/yarn)
 
+2.2 .env (in carfinder-ui/)
 
+Option A (no proxy, recommended):
 
-| Method | Endpoint             | Description             |
+VITE_API_BASE=http://localhost:8080/api
 
-|--------|----------------------|-------------------------|
 
-| GET    | `/cars`              | Get all cars            |
+Option B (proxy via Vite):
 
-| GET    | `/cars/{id}`         | Get car by ID           |
+VITE_API_BASE=/api
 
 
+and vite.config.ts:
 
-\### 🔧 Admin Only
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: 5173,
+    strictPort: true,        // don’t silently switch to 5174
+    proxy: {
+      '/api': { target: 'http://localhost:8080', changeOrigin: true }
+    }
+  }
+});
 
+2.3 Key files you already have
+src/App.jsx
 
-| Method | Endpoint             | Description             |
+Sets axios.defaults.baseURL = import.meta.env.VITE_API_BASE.
 
-|--------|----------------------|-------------------------|
+Attaches Authorization: Basic <token> interceptor once.
 
-| POST   | `/cars`              | Create a new car        |
+Keeps session with { isLoggedIn, isAdmin, username }.
 
-| PUT    | `/cars/{id}`         | Update a car            |
+On login:
 
-| DELETE | `/cars/{id}`         | Delete a car            |
+Validate /cars
 
+Fetch /auth/me → derive isAdmin from roles.
 
+src/components/vehicle-list/VehicleList.jsx
 
----
+Loads /cars, normalizes subModel → submodel for UI.
 
+Shows Add/Edit/Delete buttons only if isAdmin.
 
+Calls backend:
 
-\## 📦 Sample JSON Payload
+POST /cars (admin)
 
+PUT /cars/{id} (admin)
 
+DELETE /cars/{id} (admin)
 
-```json
+Shows SuccessModal with:
 
-{
+“Car has been added successfully.”
 
-&nbsp; "vin": "1HGCM82633A004352",
+“Car Id X has been updated successfully.”
 
-&nbsp; "make": "Honda",
+“Car Id X has been deleted successfully.”
 
-&nbsp; "model": "Civic",
+Filters, sort, saved/favorites, search.
 
-&nbsp; "subModel": "EX",
+src/components/vehicle/VehicleForm.jsx
 
-&nbsp; "year": 2020,
+Client-side validation mirrors backend:
 
-&nbsp; "price": 23499.00,
+No blanks (VIN/Make/Model/Submodel/Transmission/Color/Image)
 
-&nbsp; "mileage": 16500,
+VIN uppercase, strips I/O/Q
 
-&nbsp; "color": "Red",
+Year [1930, 2026], Price [5000, 350000], Mileage ≥ 0
 
-&nbsp; "transmission": "Automatic",
+On server error:
 
-&nbsp; "image": "https://example.com/car.jpg"
+400: maps errors to field messages (also maps subModel → submodel)
 
-}
+409: banner “Cannot add car with same VIN.”
 
+src/components/Navigation/Navigation.jsx
 
+Displays Admin or User name/initials.
 
-🔐 Authentication
+Logo click returns to “Browse” (home inventory).
 
-Uses Basic Auth for simplicity:
+If you haven’t yet: make the logo a button and call onBrowse() from VehicleList (already wired).
 
+2.4 Run frontend
+cd CarFinder/carfinder-ui
+npm i
+npm run dev
 
 
-Username	Password	Role
+Open http://localhost:5173
 
-admin	admin123	ADMIN
+2.5 Logins
 
-user	user123	USER
+Admin: admin / admin123 → can create/edit/delete
 
-📘 Swagger UI
+User: user / user123 → read-only
 
-Access interactive API docs at:
+3) API Cheatsheet
 
+List
 
+curl -u user:user123 http://localhost:8080/api/cars
 
-Code
 
-http://localhost:8080/swagger-ui/index.html
+Create (ADMIN)
 
-🧪 Postman Collection
+curl -X POST -u admin:admin123 http://localhost:8080/api/cars \
+  -H "Content-Type: application/json" \
+  -d '{
+    "vin":"1HGCM82633A004352",
+    "year":2022,
+    "make":"HONDA",
+    "model":"ACCORD",
+    "subModel":"EX-L",
+    "mileage":15000,
+    "color":"Blue",
+    "transmission":"Automatic",
+    "price":24000.00,
+    "image":"https://example.com/img.jpg"
+  }'
 
-A ready-to-import Postman collection is available to test all endpoints. Includes:
 
+Update (ADMIN)
 
+curl -X PUT -u admin:admin123 http://localhost:8080/api/cars/21 \
+  -H "Content-Type: application/json" \
+  -d '{"vin":"...", "year":2021, "make":"...", "model":"...", "subModel":"...","mileage":20000,"color":"Black","transmission":"Manual","price":19999.99,"image":"..."}'
 
-Auth headers
 
+Delete (ADMIN)
 
+curl -X DELETE -u admin:admin123 http://localhost:8080/api/cars/21
 
-Sample payloads
 
+Who am I?
 
+curl -u admin:admin123 http://localhost:8080/api/auth/me
 
-Success \& error response examples
+4) Troubleshooting (based on issues we hit)
 
+CORS (No 'Access-Control-Allow-Origin'):
 
+Backend @CrossOrigin(origins="http://localhost:5173", allowCredentials="true").
 
-🛠 Technologies Used
+Ensure .env → VITE_API_BASE=http://localhost:8080/api (Option A), or use Vite proxy (Option B).
 
-Java 17
+Fix Vite port drift using strictPort: true (so you notice if it tries 5174).
 
+Port already in use:
 
+Free 8080 (backend) or change server.port.
 
-Spring Boot 3.x
+Free 5173 (frontend) or change Vite port (and update CORS origin).
 
+401 on login:
 
+Wrong creds, or interceptor not attaching Authorization. Clear localStorage.basicAuth, refresh and try again.
 
-Spring Security
+403 when saving/deleting:
 
+You logged in as user/user123. Only ADMIN can POST/PUT/DELETE.
 
+409 duplicate VIN:
 
-Spring Data JPA
+Change VIN. The backend enforces uniqueness (create & update).
 
+“Unknown database 'vehicle_db'”:
 
+Create DB; verify JDBC URL and credentials.
 
-MySQL
+5) Suggested Scripts (optional)
 
+Unix (CarFinder/Makefile):
 
+run-backend:
+\tcd backend && ./mvnw spring-boot:run
 
-Swagger (Springdoc OpenAPI)
+run-frontend:
+\tcd carfinder-ui && npm run dev
 
 
+Windows (CarFinder/run-backend.bat / run-frontend.bat):
 
-Postman
+:: run-backend.bat
+cd backend
+mvnw.cmd spring-boot:run
 
+:: run-frontend.bat
+cd carfinder-ui
+npm run dev
 
+6) Screenshots (placeholders)
 
-📂 Setup Instructions
+Add these under CarFinder/docs/screenshots/:
 
-Clone the repo
+login.png – Login page
 
+inventory.png – Card grid with filters
 
+edit.png – Edit modal
 
-Configure application.properties with your MySQL credentials
+success.png – Success modal (“Car has been added successfully.”)
 
+Reference them in your README if you want:
 
+![Login](docs/screenshots/login.png)
+![Inventory](docs/screenshots/inventory.png)
+![Edit](docs/screenshots/edit.png)
+![Success](docs/screenshots/success.png)
 
-Run the app with mvn spring-boot:run
+7) Notes on Mapping & Validation
 
+Mapping: Backend uses subModel; UI uses submodel.
 
+In reads: subModel → submodel
 
-Access Swagger or test via Postman
+In writes: submodel → subModel
 
+VIN cleaning (UI): uppercase + strips I/O/Q on change.
 
+Field coverage: both client and server validate; server is the source of truth.
 
-🧠 Future Enhancements
+Logo to Home: in Navigation.jsx, logo is a button that calls onBrowse(); VehicleList handles this by resetting filters/search to show inventory.
 
-JWT-based authentication
+8) What to Commit
 
+This README
 
+Backend config (application.properties) without real passwords in VCS (use env vars in prod).
 
-Pagination and filtering
+Frontend .env.example (not your real .env).
 
-
-
-Frontend integration (React or Angular)
-
-
-
-Dockerized deployment
-
-
+Add /docs/screenshots/*.png when ready.
 
 👨‍💻 Authors:
-
-
 
 1. Mariana Rebollar
 2. Julieta Vargas

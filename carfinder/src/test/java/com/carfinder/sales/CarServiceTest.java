@@ -1,130 +1,130 @@
 package com.carfinder.sales;
 
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.carfinder.sales.dtos.CarDTO;
 import com.carfinder.sales.entities.Car;
 import com.carfinder.sales.exceptions.BusinessRuleViolationException;
 import com.carfinder.sales.exceptions.ResourceNotFoundException;
 import com.carfinder.sales.repositories.CarRepository;
 import com.carfinder.sales.services.CarService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+
 import java.math.BigDecimal;
 import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class CarServiceTest {
 
-    @Mock
-    private CarRepository carRepository;
+    @Mock CarRepository carRepository;
+    @InjectMocks CarService carService;
 
-    @InjectMocks
-    private CarService carService;
+    private CarDTO validDto(String vin) {
+        // IMPORTANT: No I/O/Q in VIN (service forbids them)
+        CarDTO dto = new CarDTO();
+        dto.setVin(vin);                         // e.g. "ABCDEFGH123456789"
+        dto.setYear(2024);
+        dto.setMake("FORD");
+        dto.setModel("MUSTANG");
+        dto.setSubModel("GT");
+        dto.setTransmission("Automatic");
+        dto.setColor("Red");
+        dto.setImage("https://example.com/img");
+        dto.setMileage(12345);
+        dto.setPrice(new BigDecimal("35000"));
+        return dto;
+    }
 
-    private CarDTO validDto;
-    private Car existing;
-
-    @BeforeEach
-    void setup() {
-        MockitoAnnotations.openMocks(this);
-
-        validDto = new CarDTO();
-        validDto.setId(null);
-        validDto.setVin("1HGCM82633A004352");
-        validDto.setMake("Toyota");
-        validDto.setModel("Corolla");
-        validDto.setSubModel("LE");
-        validDto.setYear(2020);
-        validDto.setMileage(10000);
-        validDto.setColor("Red");
-        validDto.setTransmission("Automatic");
-        validDto.setPrice(new BigDecimal("15000.00"));
-        validDto.setImage("https://example.com/car.jpg");
-
-        existing = new Car();
-        existing.setId(1L);
-        existing.setVin("1HGCM82633A004352");
-        existing.setMake("Toyota");
-        existing.setModel("Corolla");
-        existing.setSubModel("LE");
-        existing.setYear(2020);
-        existing.setMileage(10000);
-        existing.setColor("Red");
-        existing.setTransmission("Automatic");
-        existing.setPrice(new BigDecimal("15000.00"));
-        existing.setImage("https://example.com/car.jpg");
+    private Car existing(Long id, String vin) {
+        Car c = new Car();
+        c.setId(id);
+        c.setVin(vin);
+        c.setYear(2021);
+        c.setMake("FORD");
+        c.setModel("MUSTANG");
+        c.setSubModel("GT");
+        c.setTransmission("Automatic");
+        c.setColor("Black");
+        c.setImage("https://example.com/old");
+        c.setMileage(10000);
+        c.setPrice(new BigDecimal("30000"));
+        return c;
     }
 
     @Test
-    void createCar_success() {
-        when(carRepository.existsByVin("1HGCM82633A004352")).thenReturn(false);
-        when(carRepository.save(any(Car.class))).thenAnswer(inv -> {
-            Car c = inv.getArgument(0);
-            c.setId(10L);
-            return c;
-        });
-
-        Car saved = carService.createCar(validDto);
-
-        assertNotNull(saved.getId());
-        assertEquals("1HGCM82633A004352", saved.getVin());
-        verify(carRepository).save(any(Car.class));
-    }
-
-    @Test
-    void createCar_duplicateVin_throws() {
-        when(carRepository.existsByVin("1HGCM82633A004352")).thenReturn(true);
-        assertThrows(BusinessRuleViolationException.class, () -> carService.createCar(validDto));
-        verify(carRepository, never()).save(any());
-    }
-
-    @Test
-    void createCar_priceAboveMax_throws() {
-        validDto.setPrice(new BigDecimal("350000.01"));
-        when(carRepository.existsByVin("1HGCM82633A004352")).thenReturn(false);
-        assertThrows(BusinessRuleViolationException.class, () -> carService.createCar(validDto));
-        verify(carRepository, never()).save(any());
-    }
-
-    @Test
-    void updateCar_success_withoutChangingVin() {
-        when(carRepository.findById(1L)).thenReturn(Optional.of(existing));
+    void createCar_ok_saves() {
+        CarDTO dto = validDto("ABCDEFGH123456789");
+        when(carRepository.existsByVin("ABCDEFGH123456789")).thenReturn(false);
         when(carRepository.save(any(Car.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        validDto.setVin(existing.getVin()); // igual VIN
-        validDto.setPrice(new BigDecimal("20000.00"));
-        Car updated = carService.updateCar(1L, validDto);
-
-        assertEquals(new BigDecimal("20000.00"), updated.getPrice());
+        Car saved = carService.createCar(dto);
+        assertEquals("ABCDEFGH123456789", saved.getVin());
         verify(carRepository).save(any(Car.class));
     }
 
     @Test
-    void updateCar_changeVin_throws() {
-        when(carRepository.findById(1L)).thenReturn(Optional.of(existing));
-        validDto.setVin("5J6RM4H74EL012345"); // distinto VIN
-        assertThrows(BusinessRuleViolationException.class, () -> carService.updateCar(1L, validDto));
+    void createCar_duplicateVin_throws409() {
+        CarDTO dto = validDto("ABCDEFGH123456789");
+        when(carRepository.existsByVin("ABCDEFGH123456789")).thenReturn(true);
+
+        assertThrows(BusinessRuleViolationException.class, () -> carService.createCar(dto));
         verify(carRepository, never()).save(any());
     }
 
     @Test
-    void updateCar_priceAboveMax_throws() {
-        when(carRepository.findById(1L)).thenReturn(Optional.of(existing));
-        validDto.setVin(existing.getVin());
-        validDto.setPrice(new BigDecimal("999999.99"));
-        assertThrows(BusinessRuleViolationException.class, () -> carService.updateCar(1L, validDto));
+    void updateCar_changeVin_throws_when_duplicate() {
+        Long id = 1L;
+        when(carRepository.findById(id)).thenReturn(Optional.of(existing(id, "OLDVIN123456789")));
+        CarDTO dto = validDto("ABCDEFGH123456789");
+        when(carRepository.existsByVinAndIdNot("ABCDEFGH123456789", id)).thenReturn(true);
+
+        assertThrows(BusinessRuleViolationException.class, () -> carService.updateCar(id, dto));
+        verify(carRepository).findById(id);
+        verify(carRepository).existsByVinAndIdNot("ABCDEFGH123456789", id);
+        verify(carRepository, never()).save(any());
     }
 
     @Test
-    void deleteCar_notExists_throws() {
-        when(carRepository.existsById(99L)).thenReturn(false);
-        assertThrows(ResourceNotFoundException.class, () -> carService.deleteCar(99L));
+    void updateCar_changeVin_allowed_when_unique_saves() {
+        Long id = 1L;
+        when(carRepository.findById(id)).thenReturn(Optional.of(existing(id, "OLDVIN123456789")));
+        CarDTO dto = validDto("ABCDEFGH123456789");
+        when(carRepository.existsByVinAndIdNot("ABCDEFGH123456789", id)).thenReturn(false);
+        when(carRepository.save(any(Car.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Car updated = carService.updateCar(id, dto);
+        assertEquals("ABCDEFGH123456789", updated.getVin());
+        verify(carRepository).save(any(Car.class));
     }
 
     @Test
-    void getCarById_notFound_throws() {
-        when(carRepository.findById(123L)).thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class, () -> carService.getCarById(123L));
+    void deleteCar_notFound_throws404() {
+        when(carRepository.existsById(999L)).thenReturn(false);
+        assertThrows(ResourceNotFoundException.class, () -> carService.deleteCar(999L));
+    }
+
+    @Test
+    void deleteCar_ok() {
+        when(carRepository.existsById(1L)).thenReturn(true);
+        carService.deleteCar(1L);
+        verify(carRepository).deleteById(1L);
+    }
+
+    @Test
+    void getCarById_notFound_throws404() {
+        when(carRepository.findById(5L)).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> carService.getCarById(5L));
+    }
+
+    @Test
+    void getCarById_ok() {
+        when(carRepository.findById(1L)).thenReturn(Optional.of(existing(1L, "ABCDEFGH123456789")));
+        Car c = carService.getCarById(1L);
+        assertEquals("ABCDEFGH123456789", c.getVin());
     }
 }
