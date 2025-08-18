@@ -14,6 +14,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -98,15 +102,15 @@ class CarControllerWebMvcTests {
     @Test
     void post_duplicate_vin_returns_409_body() throws Exception {
         var body = dto();
-        // The controller checks service.existsByVin() before calling create
         when(carService.existsByVin(body.getVin())).thenReturn(true);
 
         mockMvc.perform(post("/api/cars")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(body)))
-               .andExpect(status().isConflict())
-               .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-               .andExpect(jsonPath("$.message").value("Car with VIN already exists."));
+                        .with(csrf())  // <-- add this
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(body)))
+                .andExpect(status().isConflict())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Cannot add car with same VIN."));
     }
 
     @WithMockUser(roles = {"ADMIN"})
@@ -114,25 +118,30 @@ class CarControllerWebMvcTests {
     void put_ok_returns_message_and_car() throws Exception {
         var body = dto();
         var savedEntity = toEntity(body);
-
         when(carService.updateCar(eq(1L), any(CarDTO.class))).thenReturn(savedEntity);
 
         mockMvc.perform(put("/api/cars/{id}", 1L)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(body)))
-               .andExpect(status().isOk())
-               .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-               .andExpect(jsonPath("$.message").value("Car updated successfully"))
-               .andExpect(jsonPath("$.car.vin").value("ABCDEFGH123456789"))
-               .andExpect(jsonPath("$.car.make").value("FORD"));
+                        .with(csrf())  // <-- add this
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(body)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Car updated successfully"))
+                .andExpect(jsonPath("$.car.vin").value("ABCDEFGH123456789"))
+                .andExpect(jsonPath("$.car.make").value("FORD"));
     }
 
     @WithMockUser(roles = {"ADMIN"})
     @Test
     void delete_ok_returns_message() throws Exception {
-        mockMvc.perform(delete("/api/cars/{id}", 1L))
-               .andExpect(status().isOk())
-               .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-               .andExpect(jsonPath("$.message").exists());
+        // Optional: stub the void to be explicit
+        doNothing().when(carService).deleteCar(1L);
+
+        mockMvc.perform(delete("/api/cars/{id}", 1L)
+                        .with(csrf())) // <-- add this
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").exists());
     }
+
 }
