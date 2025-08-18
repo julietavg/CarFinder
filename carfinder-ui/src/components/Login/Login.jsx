@@ -41,7 +41,7 @@ const Login = ({ onLogin }) => {
       </div>
       <div className="login-container">
         <div className="login-box">
-          <h2>Sign in</h2>
+          <h2>Login</h2>
           <form onSubmit={handleSubmit} autoComplete="off">
             <input
               type="text"
@@ -62,7 +62,7 @@ const Login = ({ onLogin }) => {
                 <span className="dots-spinner" aria-label="Cargando">
                   <span></span><span></span><span></span>
                 </span>
-              ) : 'Sign in'}
+              ) : 'Login'}
             </button>
           </form>
         </div>

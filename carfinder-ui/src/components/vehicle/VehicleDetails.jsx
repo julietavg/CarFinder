@@ -42,53 +42,13 @@ const VehicleDetails = ({ vehicle, onClose }) => {
         <button className="close-btn" onClick={handleClose}>×</button>
         
         {/* New Header Section */}
-        <div className="modal-header" style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '20px 25px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-          background: 'linear-gradient(135deg, rgba(40, 40, 60, 0.8), rgba(30, 30, 45, 0.8))',
-          position: 'relative',
-          zIndex: 10,
-          width: '100%',
-          boxSizing: 'border-box',
-          margin: '0 0 0 0'
-        }}>
-          <div className="modal-header-left" style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px'
-          }}>
-            <span className="modal-year" style={{
-              fontSize: '1rem',
-              fontWeight: '600',
-              color: '#aaaaaa',
-              background: 'rgba(60, 60, 80, 0.6)',
-              padding: '6px 12px',
-              borderRadius: '6px',
-              border: '1px solid rgba(255, 255, 255, 0.1)'
-            }}>{vehicle.year}</span>
-            <h2 className="modal-title" style={{
-              fontSize: '1.5rem',
-              fontWeight: '700',
-              color: '#ffffff',
-              margin: '0',
-              textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
-            }}>{vehicle.make} {vehicle.model}</h2>
+        <div className="modal-header">
+          <div className="modal-header-left">
+            <span className="modal-year">{vehicle.year}</span>
+            <h2 className="modal-title">{vehicle.make} {vehicle.model}</h2>
           </div>
-          
           <div className="modal-header-right">
-            <span className="modal-price" style={{
-              fontSize: '1.4rem',
-              fontWeight: '800',
-              color: '#ffffff',
-              background: 'linear-gradient(90deg, #3a3a50, #5a5a75)',
-              padding: '10px 18px',
-              borderRadius: '8px',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
-            }}>
+            <span className="modal-price">
               {vehicle.price ? new Intl.NumberFormat('en-US', {
                 style: 'currency',
                 currency: 'USD',

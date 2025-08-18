@@ -16,11 +16,11 @@ spec:
     spec:
       containers:
         - name: carfinder-frontend
-          image: 192.168.1.72:8085/carfinder-ui:latest
+          image: 10.83.66.54:8085/carfinder-ui:latest
           ports:
             - containerPort: 80
         - name: carfinder-backend
-          image: 192.168.1.72:8085/carfinder-api:latest
+          image: 10.83.66.54:8085/carfinder-api:latest
           ports:
             - containerPort: 8081
           env:

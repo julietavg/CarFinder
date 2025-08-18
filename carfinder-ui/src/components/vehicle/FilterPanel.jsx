@@ -330,6 +330,7 @@ const FilterPanel = ({ onFilterChange, vehicles = [] }) => {
           <button className="apply-btn" onClick={handleApplyFilters}>Apply Filters</button>
         </div>
       </div>
+  {expanded && <div className="filter-overlay" onClick={handleToggleExpanded} aria-hidden="true" />}
     </div>
   );
 };
