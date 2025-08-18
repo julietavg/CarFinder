@@ -99,74 +99,74 @@ const VehicleList = ({ onLogout }) => {
 
   // Efecto para aplicar filtros, búsqueda y ordenación
   useEffect(() => {
-    if (vehicles.length > 0) {
-      // Empezamos con todos los vehículos
-      let result = [...vehicles];
-      
-      // Aplicar filtro de búsqueda si existe
-      if (searchQuery && searchQuery.trim() !== '') {
-        const query = searchQuery.toLowerCase().trim();
-        result = result.filter(vehicle => 
-          vehicle.make.toLowerCase().includes(query) ||
-          vehicle.model.toLowerCase().includes(query) ||
-          vehicle.year.toString().includes(query) ||
-          (vehicle.submodel?.toLowerCase().includes(query))
-        );
-      }
-      
-      // Aplicamos los filtros si existen
-      if (activeFilters) {
-        // Filtrar por rango de precio
-        result = result.filter(vehicle => 
-          vehicle.price >= activeFilters.priceRange[0] && 
-          vehicle.price <= activeFilters.priceRange[1]
-        );
-        
-        // Filtrar por rango de años
-        result = result.filter(vehicle => 
-          vehicle.year >= activeFilters.years[0] && 
-          vehicle.year <= activeFilters.years[1]
-        );
-        
-        // Filtrar por marcas seleccionadas
-        if (activeFilters.makes.length > 0) {
-          result = result.filter(vehicle => 
-            activeFilters.makes.includes(vehicle.make)
-          );
-        }
-        
-        // Filtrar por modelos seleccionados
-        if (activeFilters.models.length > 0) {
-          result = result.filter(vehicle => 
-            activeFilters.models.includes(vehicle.model)
-          );
-        }
-      }
-      
-      // Ordenar vehículos según la opción seleccionada
-      switch (sortOption) {
-        case 'newest':
-          result.sort((a, b) => b.year - a.year);
-          break;
-        case 'oldest':
-          result.sort((a, b) => a.year - b.year);
-          break;
-        case 'price-low':
-          result.sort((a, b) => a.price - b.price);
-          break;
-        case 'price-high':
-          result.sort((a, b) => b.price - a.price);
-          break;
-        default:
-          break;
-      }
-      // Mostrar solo guardados si está activo el modo
-      if (viewSavedOnly) {
-        result = result.filter(v => savedVehicles.includes(v.id));
-      }
-      
-      setFilteredVehicles(result);
+    // Always update filteredVehicles, even when vehicles is empty
+    // Empezamos con todos los vehículos
+    let result = [...vehicles];
+    
+    // Aplicar filtro de búsqueda si existe
+    if (searchQuery && searchQuery.trim() !== '') {
+      const query = searchQuery.toLowerCase().trim();
+      result = result.filter(vehicle => 
+        vehicle.make.toLowerCase().includes(query) ||
+        vehicle.model.toLowerCase().includes(query) ||
+        vehicle.year.toString().includes(query) ||
+        (vehicle.submodel?.toLowerCase().includes(query))
+      );
     }
+    
+    // Aplicamos los filtros si existen
+    if (activeFilters) {
+      // Filtrar por rango de precio
+      result = result.filter(vehicle => 
+        vehicle.price >= activeFilters.priceRange[0] && 
+        vehicle.price <= activeFilters.priceRange[1]
+      );
+      
+      // Filtrar por rango de años
+      result = result.filter(vehicle => 
+        vehicle.year >= activeFilters.years[0] && 
+        vehicle.year <= activeFilters.years[1]
+      );
+      
+      // Filtrar por marcas seleccionadas
+      if (activeFilters.makes.length > 0) {
+        result = result.filter(vehicle => 
+          activeFilters.makes.includes(vehicle.make)
+        );
+      }
+      
+      // Filtrar por modelos seleccionados
+      if (activeFilters.models.length > 0) {
+        result = result.filter(vehicle => 
+          activeFilters.models.includes(vehicle.model)
+        );
+      }
+    }
+    
+    // Ordenar vehículos según la opción seleccionada
+    switch (sortOption) {
+      case 'newest':
+        result.sort((a, b) => b.year - a.year);
+        break;
+      case 'oldest':
+        result.sort((a, b) => a.year - b.year);
+        break;
+      case 'price-low':
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-high':
+        result.sort((a, b) => b.price - a.price);
+        break;
+      default:
+        break;
+    }
+    
+    // Mostrar solo guardados si está activo el modo
+    if (viewSavedOnly) {
+      result = result.filter(v => savedVehicles.includes(v.id));
+    }
+    
+    setFilteredVehicles(result);
   }, [vehicles, sortOption, activeFilters, searchQuery, viewSavedOnly, savedVehicles]);
 
   const handleViewDetails = (vehicleId) => {

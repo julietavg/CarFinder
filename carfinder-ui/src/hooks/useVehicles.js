@@ -98,6 +98,7 @@ export const useVehicles = () => {
 
   const deleteVehicle = async (vehicleId) => {
     try {
+      // First call the backend API to delete from database
       await axios.delete(`http://carfinder.local/api/cars/${vehicleId}`, {
         auth: {
           username: 'admin',
@@ -105,10 +106,18 @@ export const useVehicles = () => {
         },
         withCredentials: true
       });
-      fetchVehicles();
+      
+      // Only update local state after successful backend deletion
+      setVehicles(prevVehicles => prevVehicles.filter(vehicle => vehicle.id !== vehicleId));
+      
     } catch (err) {
-      setError('Could not delete vehicle.');
-      console.error('Delete vehicle error:', err);
+      if (err.response?.status === 404) {
+        // Vehicle doesn't exist in backend, remove ghost from UI
+        setVehicles(prevVehicles => prevVehicles.filter(vehicle => vehicle.id !== vehicleId));
+      } else {
+        setError('Could not delete vehicle.');
+        console.error('Delete vehicle error:', err);
+      }
     }
   };
 
