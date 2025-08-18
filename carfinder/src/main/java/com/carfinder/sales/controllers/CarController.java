@@ -1,14 +1,15 @@
 package com.carfinder.sales.controllers;
 
 import com.carfinder.sales.entities.Car;
+import com.carfinder.sales.exceptions.BusinessRuleViolationException;
 import com.carfinder.sales.mapper.CarMapper;
 import com.carfinder.sales.services.CarService;
 import com.carfinder.sales.dtos.CarDTO;
-import com.carfinder.sales.repositories.CarRepository;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,9 +17,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
+@CrossOrigin(
+    origins = "http://localhost:5173",
+    allowedHeaders = {"Authorization","Content-Type","Accept"},
+    methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},
+    allowCredentials = "true"
+)
 @RestController
 @RequestMapping("/api/cars")
 public class CarController {
@@ -26,44 +31,44 @@ public class CarController {
     @Autowired
     private CarService carService;
 
-    // ✅ Create a new car — ADMIN only
+    // CREATE — ADMIN
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> createCar(@Valid @RequestBody CarDTO carDTO) {
         if (carService.existsByVin(carDTO.getVin())) {
-            return ResponseEntity.status(409).body(Map.of(
-                    "message", "Car with VIN already exists."
-            ));
+            // 409 por VIN duplicado
+            throw new BusinessRuleViolationException("Cannot add car with same VIN.");
         }
         Car car = carService.createCar(carDTO);
-        return ResponseEntity.status(201).body(Map.of(
-                "message", "Car created successfully",
-                "car", CarMapper.toDTO(car)
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+            "message", "Car has been created successfully.",
+            "car", CarMapper.toDTO(car)
         ));
     }
 
-    // ✅ Update an existing car by ID — ADMIN only
+
+    // UPDATE — ADMIN
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateCar(@PathVariable Long id, @Valid @RequestBody CarDTO carDTO) {
         Car updatedCar = carService.updateCar(id, carDTO);
         return ResponseEntity.ok(Map.of(
-                "message", "Car updated successfully",
-                "car", CarMapper.toDTO(updatedCar)
+            "message", "Car updated successfully",
+            "car", CarMapper.toDTO(updatedCar)
         ));
     }
 
-    // ✅ Delete a car by ID — ADMIN only
+    // DELETE — ADMIN
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCar(@PathVariable Long id) {
         carService.deleteCar(id);
         return ResponseEntity.ok(Map.of(
-                "message", "Car id " + id + " has been deleted successfully."
+                "message", "Car Id " + id + " has been deleted successfully."
         ));
     }
 
-    // ✅ Get all cars — ADMIN or USER
+    // LIST — ADMIN o USER
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping
     public ResponseEntity<List<CarDTO>> getAllCars() {
@@ -74,7 +79,7 @@ public class CarController {
         return ResponseEntity.ok(cars);
     }
 
-    // ✅ Get a car by ID — ADMIN or USER
+    // GET BY ID — ADMIN o USER
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/{id}")
     public ResponseEntity<CarDTO> getCarById(@PathVariable Long id) {
@@ -82,4 +87,3 @@ public class CarController {
         return ResponseEntity.ok(CarMapper.toDTO(car));
     }
 }
-

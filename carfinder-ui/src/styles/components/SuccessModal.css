@@ -1,0 +1,24 @@
+.success-overlay{
+  position: fixed; inset: 0; background: rgba(0,0,0,.25);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; animation: fadeIn .15s ease-out;
+}
+.success-box{
+  position: relative; background: #111; color: #e7ffe7;
+  border: 1px solid #1f4125; border-radius: 12px; padding: 14px 42px 14px 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35); display: flex; gap: 10px; align-items: center;
+  animation: popIn .14s ease-out;
+}
+.success-icon{
+  width: 36px; height: 36px; border-radius: 50%; background: #163e1f; color: #7dff99;
+  display: grid; place-items: center; flex: 0 0 auto;
+}
+.success-text{ font-weight: 600; }
+.success-close{
+  position: absolute; right: 8px; top: 6px; background: transparent; border: 0; color: #9adfa9;
+  font-size: 18px; cursor: pointer; line-height: 1;
+}
+.success-close:hover{ color: #c2ffd0; }
+
+@keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+@keyframes popIn{ from{ transform: translateY(8px) scale(.98); opacity:.8 } to{ transform: none; opacity:1 } }
