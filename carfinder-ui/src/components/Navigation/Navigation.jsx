@@ -3,7 +3,18 @@ import PropTypes from 'prop-types';
 import "../../styles/components/Navigation.css";
 import logo from '../../assets/CarFinderLogo_white.png';
 
-const Navigation = ({ onSearch = () => {}, onAddVehicle = () => {}, onShowSaved = () => {}, onBrowse = () => {}, showSaved = false, onLogout = () => {} }) => {
+const Navigation = ({ onSearch = () => {}, onAddVehicle = () => {}, onShowSaved = () => {}, onBrowse = () => {}, showSaved = false, onLogout = () => {}, username = '' }) => {
+  // Determinar si es admin o cliente
+  let userInitials = '';
+  let userDisplay = '';
+  if (username === 'admin@mail.com') {
+    userInitials = 'AD';
+    userDisplay = 'Admin';
+  } else if (username) {
+    const name = username.split('@')[0];
+    userInitials = 'CL';
+    userDisplay = name.charAt(0).toUpperCase() + name.slice(1);
+  }
   const [scrolled, setScrolled] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -202,11 +213,13 @@ const Navigation = ({ onSearch = () => {}, onAddVehicle = () => {}, onShowSaved 
                 <svg className="nav-item-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg>
                 Saved Cars
               </button>
-              {/* Add */}
-              <button className="nav-link menu-item add-link" type="button" onClick={() => { onAddVehicle(); setMobileMenuOpen(false); }}>
-                <svg className="nav-item-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                Add new vehicle
-              </button>
+              {/* Add (solo admin) */}
+              {username === 'admin@mail.com' && (
+                <button className="nav-link menu-item add-link" type="button" onClick={() => { onAddVehicle?.(); setMobileMenuOpen(false); }}>
+                  <svg className="nav-item-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                  Add new vehicle
+                </button>
+              )}
               {/* Account (collapsible) */}
         <div className={`collapsible-wrapper ${accountOpen ? 'open' : ''}`}>
                 <button
@@ -272,8 +285,8 @@ const Navigation = ({ onSearch = () => {}, onAddVehicle = () => {}, onShowSaved 
           
           <div className="user-profile" ref={userMenuRef}>
             <button type="button" className={`user-trigger ${userMenuOpen ? 'open' : ''}`} onClick={() => setUserMenuOpen(o => !o)} aria-haspopup="menu" aria-expanded={userMenuOpen}>
-              <div className="user-avatar">AD</div>
-              <span className="user-name">Admin</span>
+              <div className="user-avatar">{userInitials || 'US'}</div>
+              <span className="user-name">{userDisplay || 'User'}</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="chevron">
                 <polyline points="6 9 12 15 18 9" />
               </svg>
@@ -319,5 +332,6 @@ Navigation.propTypes = {
   onShowSaved: PropTypes.func,
   onBrowse: PropTypes.func,
   showSaved: PropTypes.bool,
-  onLogout: PropTypes.func
+  onLogout: PropTypes.func,
+  username: PropTypes.string
 };

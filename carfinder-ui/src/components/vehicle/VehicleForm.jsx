@@ -101,7 +101,7 @@ const VehicleForm = ({ vehicle, onClose, onSave }) => {
       errors.submodel = 'Submodel is required';
     }
     // Year: obligatorio, entre 2025 y año siguiente
-    const minYear = 1900;
+    const minYear = 1980;
     const maxYear = 2026;
     if (!formData.year) {
       errors.year = 'Year is required';

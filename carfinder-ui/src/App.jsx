@@ -21,10 +21,12 @@ function App() {
     sessionStorage.removeItem('carfinder-logged-in');
   };
 
+  const username = sessionStorage.getItem('carfinder-username') || '';
+
   return (
     <ThemeProvider>
       <PageTransitionProvider>
-  {isLoggedIn ? <VehicleList onLogout={handleLogout} /> : <Login onLogin={handleLogin} />}
+  {isLoggedIn ? <VehicleList onLogout={handleLogout} username={username} /> : <Login onLogin={handleLogin} />}
       </PageTransitionProvider>
     </ThemeProvider>
   );

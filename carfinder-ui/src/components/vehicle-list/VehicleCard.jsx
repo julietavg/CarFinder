@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import formatPrice from '../../utils/formatPrice';
 
-const VehicleCard = memo(function VehicleCard({ vehicle, index, onView, onEdit, onDelete, onImageError }) {
+const VehicleCard = memo(function VehicleCard({ vehicle, index, onView, onEdit, onDelete, onImageError, isAdmin = false }) {
   return (
     <div
       className="vehicle-card"
@@ -24,22 +24,26 @@ const VehicleCard = memo(function VehicleCard({ vehicle, index, onView, onEdit, 
           >
             View Details
           </button>
-          <button
-            className="action-btn edit-btn"
-            onClick={() => onEdit(vehicle)}
-            style={{ animationDelay: `${0.5 + index * 0.15}s` }}
-            aria-label={`Edit ${vehicle.make} ${vehicle.model}`}
-          >
-            Edit
-          </button>
-          <button
-            className="action-btn delete-btn"
-            onClick={() => onDelete(vehicle.id)}
-            style={{ animationDelay: `${0.8 + index * 0.15}s` }}
-            aria-label={`Delete ${vehicle.make} ${vehicle.model}`}
-          >
-            Delete
-          </button>
+          {isAdmin && (
+            <>
+              <button
+                className="action-btn edit-btn"
+                onClick={() => onEdit(vehicle)}
+                style={{ animationDelay: `${0.5 + index * 0.15}s` }}
+                aria-label={`Edit ${vehicle.make} ${vehicle.model}`}
+              >
+                Edit
+              </button>
+              <button
+                className="action-btn delete-btn"
+                onClick={() => onDelete(vehicle.id)}
+                style={{ animationDelay: `${0.8 + index * 0.15}s` }}
+                aria-label={`Delete ${vehicle.make} ${vehicle.model}`}
+              >
+                Delete
+              </button>
+            </>
+          )}
         </div>
       </div>
       <div className="vehicle-info">
@@ -65,6 +69,7 @@ VehicleCard.propTypes = {
   onView: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
+  isAdmin: PropTypes.bool,
   onImageError: PropTypes.func.isRequired
 };
 

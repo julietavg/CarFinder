@@ -26,7 +26,10 @@ const Login = ({ onLogin }) => {
     // Aquí irá la llamada real al backend
     setTimeout(() => {
       setLoading(false);
-      if (username === 'admin@mail.com' && password === 'admin123') {
+      const isAdmin = username === 'admin@mail.com' && password === 'admin123';
+      const isClient = username === 'client@mail.com' && password === 'cliente123';
+      if (isAdmin || isClient) {
+        sessionStorage.setItem('carfinder-username', username);
         onLogin && onLogin();
       } else {
         setError('Invalid username or password.');

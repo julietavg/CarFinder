@@ -9,7 +9,7 @@ import Navigation from "../Navigation/Navigation";
 import FilterPanel from '../vehicle/FilterPanel';
 import ConfirmationModal from '../vehicle/ConfirmationModal';
 
-const VehicleList = ({ onLogout }) => {
+const VehicleList = ({ onLogout, username = '' }) => {
   const {
     vehicles,
     loading,
@@ -21,6 +21,7 @@ const VehicleList = ({ onLogout }) => {
   const [imageErrors, setImageErrors] = useState({});
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false); /* triggered only from navbar now */
+  const isAdmin = username === 'admin@mail.com';
   const [editingVehicle, setEditingVehicle] = useState(null);
   const [filteredVehicles, setFilteredVehicles] = useState([]);
   const [sortOption, setSortOption] = useState('price-low');
@@ -50,7 +51,10 @@ const VehicleList = ({ onLogout }) => {
   };
 
   // Opening add form now only via navbar's onAddVehicle prop
-  const openAddForm = () => setShowAddForm(true);
+  const openAddForm = () => {
+    if (!isAdmin) return; // clients no pueden crear
+    setShowAddForm(true);
+  };
   
 
   const handleSaveVehicle = async (vehicleData) => {
@@ -178,6 +182,7 @@ const VehicleList = ({ onLogout }) => {
   };
 
   const handleEdit = (vehicleId) => {
+    if (!isAdmin) return;
     console.log('Edit vehicle:', vehicleId);
     const vehicle = filteredVehicles.find(v => v.id === vehicleId);
     if (vehicle) {
@@ -186,6 +191,7 @@ const VehicleList = ({ onLogout }) => {
   };
 
   const handleDelete = (vehicleId) => {
+    if (!isAdmin) return;
     console.log('Delete vehicle:', vehicleId);
     const vehicle = filteredVehicles.find(v => v.id === vehicleId);
     if (vehicle) {
@@ -196,6 +202,7 @@ const VehicleList = ({ onLogout }) => {
 
 
   const confirmDelete = async () => {
+    if (!isAdmin) return;
     if (vehicleToDelete) {
       await deleteVehicle(vehicleToDelete.id);
       setVehicleToDelete(null);
@@ -359,20 +366,24 @@ const VehicleList = ({ onLogout }) => {
                       >
                         View Details
                       </button>
-                      <button 
-                        className="action-btn edit-btn" 
-                        onClick={() => handleEdit(vehicle.id)}
-                        style={{animationDelay: `${0.7 + index * 0.15}s`}}
-                      >
-                        Edit
-                      </button>
-                      <button 
-                        className="action-btn delete-btn" 
-                        onClick={() => handleDelete(vehicle.id)}
-                        style={{animationDelay: `${0.8 + index * 0.15}s`}}
-                      >
-                        Delete
-                      </button>
+                      {isAdmin && (
+                        <>
+                          <button 
+                            className="action-btn edit-btn" 
+                            onClick={() => handleEdit(vehicle.id)}
+                            style={{animationDelay: `${0.7 + index * 0.15}s`}}
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            className="action-btn delete-btn" 
+                            onClick={() => handleDelete(vehicle.id)}
+                            style={{animationDelay: `${0.8 + index * 0.15}s`}}
+                          >
+                            Delete
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -390,11 +401,12 @@ const VehicleList = ({ onLogout }) => {
       <Particles />
   <Navigation
     onSearch={(q) => setSearchQuery(q)}
-    onAddVehicle={openAddForm}
+    onAddVehicle={isAdmin ? openAddForm : undefined}
     onShowSaved={() => setViewSavedOnly(true)}
     onBrowse={() => setViewSavedOnly(false)}
     showSaved={viewSavedOnly}
-  onLogout={onLogout}
+    onLogout={onLogout}
+    username={username}
   />
       
       {selectedVehicle && (
@@ -404,7 +416,7 @@ const VehicleList = ({ onLogout }) => {
         />
       )}
       
-      {(showAddForm || editingVehicle) && (
+  {isAdmin && (showAddForm || editingVehicle) && (
         <VehicleForm
           vehicle={editingVehicle}
           onClose={() => {
@@ -444,6 +456,11 @@ const VehicleList = ({ onLogout }) => {
 };
 
 export default VehicleList;
+
+VehicleList.propTypes = {
+  onLogout: PropTypes.func,
+  username: PropTypes.string
+};
 
 VehicleList.propTypes = {
   onLogout: PropTypes.func,
