@@ -79,16 +79,67 @@ const VehicleForm = ({ vehicle, onClose, onSave }) => {
   
   const validateForm = () => {
     const errors = {};
-    
-    // Solo validaciones de formato, no de campos obligatorios
-    if (formData.year && (formData.year < 1900 || formData.year > new Date().getFullYear() + 1)) {
-      errors.year = `Year must be between 1900 and ${new Date().getFullYear() + 1}`;
+    // VIN: obligatorio, exactamente 17 caracteres, sin I, O, Q
+    if (!formData.vin) {
+      errors.vin = 'VIN is required';
+    } else if (formData.vin.length !== 17) {
+      errors.vin = 'VIN must be exactly 17 characters';
+    } else if (/[IOQ]/i.test(formData.vin)) {
+      errors.vin = 'VIN cannot contain I, O, or Q';
     }
-    
-    if (formData.price && parseInt(formData.price) <= 0) {
-      errors.price = 'Price must be greater than zero';
+
+    // Make: obligatorio
+    if (!formData.make) {
+      errors.make = 'Make is required';
     }
-    
+    // Model: obligatorio
+    if (!formData.model) {
+      errors.model = 'Model is required';
+    }
+    // Submodel: obligatorio
+    if (!formData.submodel) {
+      errors.submodel = 'Submodel is required';
+    }
+    // Year: obligatorio, entre 2025 y año siguiente
+    const minYear = 1900;
+    const maxYear = 2026;
+    if (!formData.year) {
+      errors.year = 'Year is required';
+    } else if (formData.year < minYear || formData.year > maxYear) {
+      errors.year = `Year must be between ${minYear} and ${maxYear}`;
+    }
+    // Mileage: obligatorio, mayor o igual a 0
+    if (formData.mileage === '' || formData.mileage === null || formData.mileage === undefined) {
+      errors.mileage = 'Mileage is required';
+    } else if (parseInt(formData.mileage) < 0) {
+      errors.mileage = 'Mileage must be 0 or greater';
+    }
+    // Color: obligatorio
+    if (!formData.color) {
+      errors.color = 'Color is required';
+    }
+    // Transmission: obligatorio, debe ser Automatic o Manual
+    if (!formData.transmission) {
+      errors.transmission = 'Transmission is required';
+    } else if (!['Automatic', 'Manual'].includes(formData.transmission)) {
+      errors.transmission = 'Transmission must be Automatic or Manual';
+    }
+    // Price: obligatorio, entre 5000 y 350000
+    const minPrice = 5000;
+    const maxPrice = 350000;
+    if (!formData.price) {
+      errors.price = 'Price is required';
+    } else if (parseInt(formData.price) < minPrice) {
+      errors.price = `Price must be at least ${minPrice}`;
+    } else if (parseInt(formData.price) > maxPrice) {
+      errors.price = `Price must not exceed ${maxPrice}`;
+    }
+    // Image: obligatorio, debe ser URL http(s)
+    if (!formData.image) {
+      errors.image = 'Image URL is required';
+    } else if (!/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(formData.image)) {
+      errors.image = 'Image must be a valid URL (jpg, jpeg, png, gif, webp)';
+    }
     return errors;
   };
   
@@ -140,6 +191,7 @@ const VehicleForm = ({ vehicle, onClose, onSave }) => {
               value={formData.vin}
               onChange={handleChange}
               disabled={formSubmitted}
+              readOnly={isEditing}
             />
           </div>
           

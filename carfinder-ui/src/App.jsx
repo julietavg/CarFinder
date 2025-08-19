@@ -6,9 +6,20 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { PageTransitionProvider } from './contexts/PageTransitionContext';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Mostrar login al inicio
-  const handleLogin = () => setIsLoggedIn(true);
-  const handleLogout = () => setIsLoggedIn(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    // Solo mantener login en la sesión actual del navegador
+    return sessionStorage.getItem('carfinder-logged-in') === 'true';
+  });
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    sessionStorage.setItem('carfinder-logged-in', 'true');
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    sessionStorage.removeItem('carfinder-logged-in');
+  };
 
   return (
     <ThemeProvider>

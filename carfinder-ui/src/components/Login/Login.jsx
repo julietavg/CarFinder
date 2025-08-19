@@ -26,7 +26,7 @@ const Login = ({ onLogin }) => {
     // Aquí irá la llamada real al backend
     setTimeout(() => {
       setLoading(false);
-      if (username === 'admin' && password === 'admin123') {
+      if (username === 'admin@mail.com' && password === 'admin123') {
         onLogin && onLogin();
       } else {
         setError('Invalid username or password.');
